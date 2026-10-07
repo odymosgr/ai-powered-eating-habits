@@ -14,19 +14,38 @@ An AI Software Engineering Project: to help you transform your eating habits and
 
 ## Business / User Problem
 
-Describe the underlying problem in plain language. Who is the user? What pain point or workflow does this solve? Why is AI engineering the right approach (vs. traditional software, rule-based systems, or classical ML)?
+Most people want to lose fat, build muscle or just eat healthier.<br>
+Instead of following strict diets, or logging in detail what they eat to the last calorie,<br>
+the simplest, lowest friction way to move towards these goals is to modify already existing habits.<br>
+The user just logs their morning bodyweight and what they ate just their voice, or camera<br>
+and the app has enough information to track their habits and suggest healthier and cheaper alternatives.<br>
+(+) After the MVP liquid intake and hydration will also be taken into account.
+
+(+) Why is AI engineering the right approach (vs. traditional software, rule-based systems, or classical ML)?
 
 ## Goal
 
-Specific, measurable goal(s). What does "solved" look like? Tie to user outcomes and timelines.
+The user reached their ideal bodyweight.<br>
+The suggestions helped them overcome a bad habit.<br>
+Their eating habits require less money, less time, make them less hungry and provide them with more energy throughout their day.<br>
+Their new habits support their exercise needs, helping them have the proper energy and recovery from their workouts.<br>
+Longshot, but maybe their new habits helped them overcome an eating disorder
+
+The onboarding period is 1 week, where the user logs their food so we can have a clear picture of their current habits.<br>
+After 1 month, the free trial ends and we should have been able to provide tangible visible outcomes. 
 
 ## Stakeholders
 
-List key people/teams and their roles/ownership (PM, Eng, Design, Data, Legal, etc.).
+Solo Career Mode Activated.<br>
+Maybe a dietitian or a behavioural phycologist would be helpful, but for now we have LLMs.<br>
+As the project grows, the team grows.<br>
+
+(+) List key people/teams and their roles/ownership (PM, Eng, Design, Data, Legal, etc.).
 
 ## Prior Work
 
-Summarize past attempts, related products/tools, or heuristic solutions. Include links if relevant.
+Researching ... ... ...
+(+) Related products/tools, or heuristic solutions. Include links if relevant.
 
 ## Input and Output
 
