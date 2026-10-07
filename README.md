@@ -29,7 +29,7 @@ The user reached their ideal bodyweight.<br>
 The suggestions helped them overcome a bad habit.<br>
 Their eating habits require less money, less time, make them less hungry and provide them with more energy throughout their day.<br>
 Their new habits support their exercise needs, helping them have the proper energy and recovery from their workouts.<br>
-Longshot, but maybe their new habits helped them overcome an eating disorder
+Longshot, but maybe their new habits will help them overcome an eating disorder.
 
 The onboarding period is 1 week, where the user logs their food so we can have a clear picture of their current habits.<br>
 After 1 month, the free trial ends and we should have been able to provide tangible visible outcomes. 
