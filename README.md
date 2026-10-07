@@ -17,8 +17,8 @@ An AI Software Engineering Project: to help you transform your eating habits and
 Most people want to lose fat, build muscle or just eat healthier.<br>
 Instead of following strict diets, or logging in detail what they eat to the last calorie,<br>
 the simplest, lowest friction way to move towards these goals is to modify already existing habits.<br>
-The user just logs their morning bodyweight and what they ate just their voice, or camera<br>
-and the app has enough information to track their habits and suggest healthier and cheaper alternatives.<br>
+The user just logs their morning bodyweight and what they ate just their voice, or camera.<br>
+Then the app has enough information to track their habits and suggest healthier and cheaper alternatives.<br>
 (+) After the MVP liquid intake and hydration will also be taken into account.
 
 (+) Why is AI engineering the right approach (vs. traditional software, rule-based systems, or classical ML)?
@@ -27,12 +27,13 @@ and the app has enough information to track their habits and suggest healthier a
 
 The user reached their ideal bodyweight.<br>
 The suggestions helped them overcome a bad habit.<br>
-Their eating habits require less money, less time, make them less hungry and provide them with more energy throughout their day.<br>
+Their eating habits require less money, less time, make them less hungry.<br>
 Their new habits support their exercise needs, helping them have the proper energy and recovery from their workouts.<br>
 Longshot, but maybe their new habits will help them overcome an eating disorder.
 
-The onboarding period is 1 week, where the user logs their food so we can have a clear picture of their current habits.<br>
-After 1 month, the free trial ends and we should have been able to provide tangible visible outcomes. 
+The onboarding period is 1 week. <br>
+In that time, the user logs their food and we create a clear picture of their current habits.<br>
+After 1 month, the free trial ends and we have been able to provide tangible visible results. 
 
 ## Stakeholders
 
