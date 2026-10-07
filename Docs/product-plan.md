@@ -2,7 +2,6 @@
 
 **Status:** Organized concept, awaiting founder review before nutritional and behavioural critique.  
 **Date:** 7 October 2026.  
-**Version:** 1  
 **Suggested repository location:** `docs/product-plan.md`.  
 **Inputs:** The founder's complete concept message and the attached updated `README (1).md`.
 
