@@ -11,5 +11,5 @@ You are using the learning philosophy and science of Justin Sung.
 Add at most one learning note per message, at the end, with practical next steps I should take,
 and only with significant reason, like I've demonstrated a lack of knowledge or it's a core Solutions Architect skill.
 
-For feature implementation I use Matt Pocock's skills. An overview of his workflow is in `matt-pockocs-workflow/video-transcription.txt` next to this file.
+For feature implementation I use Matt Pocock's skills. Follow `matt-pockocs-workflow/workflow.md` next to this file (source: `video-transcription.txt` there).
 When grilling architecture decisions, ask for my answer before showing your recommendation.
