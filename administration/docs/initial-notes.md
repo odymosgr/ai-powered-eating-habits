@@ -2,6 +2,7 @@
 
 A faithful transcription of ~31 handwritten A4 pages, in their original order. Page 0 is the part of the README that was filled in before the paper process began.
 This file records how the ideas evolved, so it does not reorganize or deduplicate them. Later pages sometimes revise earlier ones, and both versions are kept.
+Sketches whose layout carries meaning are redrawn as SVGs in [initial-notes-diagrams/](initial-notes-diagrams/), close to the paper originals in [initial-notes-paper-photos/](initial-notes-paper-photos/). Simple chains stay in Mermaid.
 
 ## How to read this file
 
@@ -167,16 +168,7 @@ flowchart LR
 - ~~After habit~~ After initial habit understanding
 - → offer no-voice options
 
-**User DB:** meals @ Conditions / per day
-
-```mermaid
-flowchart LR
-    M["meals"] -- "@" --> C["Conditions"]
-    C --> PR["probable reward"]
-    C --> T["Time"]
-    C --> E["Env"]
-    C -.- PD["per day"]
-```
+![User DB: meals @ Conditions per day, with probable reward, Time and Env attached to Conditions](initial-notes-diagrams/p04-user-db.svg)
 
 In a week, we can have a good idea of core habits; in a month an even clearer picture. But in a month we should demonstrate results → **1-month free trial**.
 
@@ -233,12 +225,7 @@ flowchart LR
 - When I'm with Mike
 - On the office lounge
 
-> **Cloud:** Ideal "Trigger": To eat healthy, and also for my goals
-
-```mermaid
-flowchart LR
-    L["Your Logic"] -- "guides<br/>(changes / overrides / defines)" --> H["Your Habits"]
-```
+![Cloud: Ideal trigger, and Your Logic guides Your Habits](initial-notes-diagrams/p06-ideal-trigger.svg)
 
 ---
 
@@ -376,7 +363,7 @@ flowchart LR
 
 ### Supermarket / Food Supply
 
-**Homepage icon:** `[Drawing: rounded-square app icon with a shopping cart, labelled "Supply"]`
+**Homepage icon:** ![Supply icon: rounded square with a shopping cart](initial-notes-diagrams/p13-supply-icon.svg)
 
 - Should be mostly a read-only page with the user's food supply habits established in onboarding. Also noting if other people play a significant role in defining them (most of the time providing time or cost $ benefits).
 - Should be updated only through a dietitian session.
@@ -418,15 +405,7 @@ flowchart LR
 
 - **Start of Onboarding:**
 
-```mermaid
-flowchart LR
-    subgraph S["Start of Onboarding: three cards"]
-        direction LR
-        BM["Build Muscle<br/>[flexed-arm icon]"]
-        LF["Lose Fat<br/>[slim silhouette, unisex]"]
-        IE["Improve Eating Habits<br/>[smiley face (probably)]"]
-    end
-```
+![Three cards: Build Muscle, Lose Fat, Improve Eating Habits](initial-notes-diagrams/p15-onboarding-cards.svg)
 
 - After the initial user-input onboarding, they will enter the app (with a brief overview, beyond MVP) and the only thing available will be their initial dietitian_OB_session. ~~Clarifying their goals,~~
   - Clarifying their goals
@@ -455,33 +434,16 @@ flowchart LR
 
 ### … Build Muscle OB Path *(+ small smiley doodle)*
 
-```mermaid
-flowchart TD
-    S((start)) --> IN["Insert bodyweight, age etc."]
-    IN --> D{"Has Str/Hyp.<br/>Training?"}
-    D -- Yes --> BC["A bulk/cut like approach<br/>would be beneficial"]
-    BC -.- N1>"“Lean bulk / cut within healthy limits<br/>& depending how user can handle the stress”"]
-    BC -. "(crossed out on paper)" .-> X["Insert age, weight etc."]
-    BC --> UA["User agrees, or prefers a diet<br/>maintaining bodyweight"]
-    UA -.- N2>"We might have to argue a bit here if we have<br/>evidence for a better user path"]
-    UA -.- N3>"We have enough info to define<br/>bodyweight goal"]
-    D -- No --> NO["Similar to the other path, since high protein helps with muscle.<br/>Just also help the user find Str/Hyp Training options,<br/>and if that doesn't work, at least physical activity options"]
-    UA --> OUT["{“Bulk”, “Cut”, “Maintain”}<br/>+ {high protein diet}"]
-    NO --> OUT
-    OUT -.- N4>"Have the ability to let the user require only<br/>vegan-protein options through the dietitian session"]
+![Build Muscle onboarding path flowchart](initial-notes-diagrams/p17-build-muscle-path.svg)
 
-    classDef struck stroke-dasharray: 5 5,color:#999;
-    class X struck
-```
-
-*The flag-shaped nodes are the cloud notes from the sketch. The dashed node is a box you crossed out and replaced with the arrow to "User agrees".*
+*Scalloped shapes are the cloud notes from the sketch. The gray dashed box is the one you crossed out and replaced with the arrow to "User agrees".*
 
 ---
 
 ## Page 18
 
 - Even though a physical activity habit is always recommended, the user has the final say and can continue without it. He can even explicitly ask the AI dietitian to never ask again, adding it to the AI's **"limiting beliefs"**: a curated list of such explicit rules, accessed in the settings page. This one also hides the workout-related features (since the user doesn't have, and explicitly doesn't want to create, such a habit). Of course we inform him that he can undo that in settings → limiting_dietitian_beliefs.
-- The App should have an exercise page `[Drawing: square icon with a stick figure doing jumping jacks]`, similar to the supply page and with similar functionality, as the user's health and scale outcomes depend heavily on physical activity.
+- The App should have an exercise page ![Exercise icon: stick figure doing jumping jacks](initial-notes-diagrams/p18-exercise-icon.svg), similar to the supply page and with similar functionality, as the user's health and scale outcomes depend heavily on physical activity.
 - At the start of the onboarding we should ask the user if he has a scale easily accessible when they wake up. The user should be able to continue using the app even without the scale feature, another "limiting dietitian belief". But of course we should argue against it first, as it is our main way of measuring progress.
   - The ideal bodyweight measurement is in the morning, after a full night's sleep and a possible trip to the toilet. Fluctuations are to be expected and should not discourage the user.
 
@@ -512,18 +474,7 @@ flowchart TD
 
 ### Measuring Progress
 
-In OB we should have defined if the user wants a
-- "calorie surplus" / "lean bulk"
-- "calorie deficit" / "leaning phase" / "cut" / "fat loss"
-- calorie maintenance ("stable" / "maingaining")
-
-diet.
-
-```mermaid
-flowchart LR
-    G["The three diet options above<br/>(bracketed together)"] --> W["Appropriate wording depending on user.<br/>Probably selected from a predefined table of alternatives<br/>and connected to user data, so the AI can use it as the<br/>preferred way when talking to the user.<br/>If / when user goals change, this should also change"]
-    W --> B["Beyond MVP: Define user archetypes with related words<br/>for a more familiar communication.<br/>… Actually an md short file per user, defining<br/>the way the AI speaks, should be enough"]
-```
+![Three diet options bracketed, leading to user-specific wording, then a beyond-MVP note](initial-notes-diagrams/p20-diet-wording.svg)
 
 We measure that mainly through ~~bodyweight~~ our hard bodyweight measurements.
 We also have a general idea of what calories the user consumes daily, so we have a good idea of their daily expenditure.
@@ -546,18 +497,9 @@ So we have:
 
 **User's Meal Map** (for habit concept demonstration purposes) **Example: "Table 1"**
 
-`[Sketch: a week grid, Monday to Sunday. Each small square is one meal, stacked top (earlier) to bottom (later) for each day. A straight line connects the meals of Habit 1 and a wavy line connects the meals of Habit 2.]`
-Reconstruction (H1 = straight line, H2 = wavy line, · = meal belonging to neither habit, blank = no meal):
+![Meal map: a week of meals, Habit 1 as a straight line, Habit 2 as a wavy line](initial-notes-diagrams/p21-meal-map.svg)
 
-| Slot | M | T | W | T | F | S | S |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | H1 | **H1 + H2** (both lines meet here) | H1 | H1 | H1 | H1 | · |
-| 2 | · |  | H2 | H2 | H2 |  |  |
-| 3 | H2 | · |  | · | · |  | H2 |
-| 4 | · | · | · | H2 | H2 | · |  |
-
-- **Habit 1:** Breakfast at home
-- **Habit 2:** Quick & easy yogurt meal
+Each small square is one meal, earlier at the top. Squares without a line belong to neither habit.
 
 - Each week, through analysis, we should be able to define 3–5 major habits. Some meals' calories might be double-counted; it's OK, but we should keep **habit overlap** to a minimum.
   - We measure habit overlap again through calories. Example (from Table 1):
@@ -574,22 +516,7 @@ Reconstruction (H1 = straight line, H2 = wavy line, · = meal belonging to neith
 
 ### Habit Trends *(Goal dependent analysis)*
 
-```mermaid
-flowchart LR
-    subgraph WX["Week X"]
-        A["Analysis"] --- MH["Main Habits<br/>1 …<br/>2 …<br/>…"]
-    end
-    subgraph WX1["Week X+1"]
-        A2[" "] --- MH2["1′ …<br/>2′<br/>3′<br/>…"]
-    end
-    WX -- "Possible Habit Changes" --> WX1
-    MH -.- N["Each one with a usefulness score defining Good / Bad<br/>according to the user's Goals at the time<br/>→ Trend Analysis is goal dependent and requires multiple weeks"]
-    WX1 --> C1["Same Habit<br/>(usefulness stable ~)"]
-    WX1 --> C2["Changed Habit<br/>(big change in usefulness)"]
-    WX1 --> C3["Eliminated old habit<br/>(Trendline stops)"]
-    WX1 --> C4["Emerged new habit<br/>(New Trendline)"]
-    C2 -.- EX["General habit-defining trigger stays the same, but the detailed<br/>description has probably changed. For example, trigger:<br/>“when I have cravings at home”, old version “I eat sweets”,<br/>new version “I eat fruit”"]
-```
+![Habit Trends: Week X to Week X+1 and the four possible habit changes](initial-notes-diagrams/p22-habit-trends.svg)
 
 - We should be able to analyze Habit Trends from back when the user had different goals (goals can change 1/week max). But make it visually explicit which older data are goal-mismatched. Maybe with a gray-scale or shadow overlay, with a clear visual of goal-changing "moments" and the ability to see these older goals in detail with a click; maybe even change the "lens" of the ~~analysis~~ trend analysis with them. (Costly compute & storage)
 
@@ -764,31 +691,10 @@ flowchart LR
 - **Dietitian Room** (elements)
   - With a locked new-session button, possibly with an animated weekly unlock bar, like:
 
-```text
-          ┌──────────────────────────────────┐   ┌──🔒──┐
-     ┌──► │          Dietitian Room          │   │  ✚   │ ◄── gray
-     │    └──────────────────────────────────┘   └──────┘
-     │    ▓▓▓▓▓▓▓✷░░░░│░░░░│░░░░│░░░░│░░░░│░░░░
-     │           ↖ sparks              ↖ easy view of remaining days
-     │                                    until able for a new one
-     │
-     ├── same color, with ability to enter
-     │
-     │    ┌──────────────────────────────────┐   ┌──────┐
-     └──► │          Dietitian Room          │   │  ✚   │ ◄── colorful
-          └──────────────────────────────────┘   └──────┘
-```
-
-```mermaid
-stateDiagram-v2
-    direction LR
-    Locked: gray ✚ with padlock + weekly unlock bar
-    Unlocked: colorful ✚
-    Locked --> Unlocked: same color, with ability to enter
-```
+![Dietitian Room: locked gray state with weekly unlock bar, then unlocked colorful state](initial-notes-diagrams/p30-dietitian-room.svg)
 
 - **Library Entry Point**
-  - Small button with a book / bookshelf icon, like: `[Drawing: rounded icon with books on a shelf]`. Maybe each color defines a category section inside the library, like:
+  - Small button with a book / bookshelf icon, like: ![Library icon: books on a shelf](initial-notes-diagrams/p30-library-icon.svg). Maybe each color defines a category section inside the library, like:
     - General Dietary Knowledge
     - Habit Loop Knowledge
     - Major Diets (& related knowledge)
@@ -825,7 +731,7 @@ stateDiagram-v2
 - p.27 header: there seems to be a missing word after "references to studies if they …".
 - p.27: the carbs value is written like "7,100g". It is read here as **≥ 100 g**.
 - p.29: the end of the crossed-out line "except if the user is …" can't be read.
-- p.21: the Meal Map table is a best-effort reconstruction of where the two lines run. Habit 2's wavy line seems to branch from Wednesday down to the late Thursday and Friday meals.
+- p.21: the Meal Map is a best-effort redraw of where the two lines run. Habit 2's wavy line seems to branch from Wednesday down to the late Thursday and Friday meals.
 
 **Other marks not transcribed:** small ✓ ticks at the top-left of pp. 26, 27 and 29 (and possibly 25), and small doodles and ink dots that don't carry meaning.
 

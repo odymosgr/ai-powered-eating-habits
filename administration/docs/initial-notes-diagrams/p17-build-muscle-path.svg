@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 770 700" width="770" height="700" role="img" aria-label="Build Muscle onboarding path flowchart">
+<title>Build Muscle onboarding path flowchart</title>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1e40af"/>
+  </marker>
+</defs>
+<style>
+  text { font-family: Helvetica, Arial, sans-serif; fill: #1e40af; font-size: 14px; }
+  .s { font-size: 12px; }
+  .b { font-weight: bold; }
+  .g { fill: #9ca3af; }
+  .ln { fill: none; stroke: #1e40af; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .box { fill: none; stroke: #1e40af; stroke-width: 1.6; }
+  .dot { fill: none; stroke: #1e40af; stroke-width: 1.3; stroke-dasharray: 2 4; stroke-linecap: round; }
+  .struck { fill: none; stroke: #9ca3af; stroke-width: 1.4; stroke-dasharray: 5 4; }
+</style>
+<rect x="0.5" y="0.5" width="769" height="699" rx="10" fill="#fffef8" stroke="#e5e7eb"/>
+<text x="30" y="40" class="b"><tspan x="30" dy="0">… Build Muscle OB Path  ☺</tspan></text>
+<ellipse cx="80" cy="96" rx="22" ry="13" class="box"/><text x="80" y="74" class="s" text-anchor="middle"><tspan x="80" dy="0">start</tspan></text>
+<path d="M80,109 L80,148" class="ln" marker-end="url(#arr)"/>
+<rect x="30" y="150" width="120" height="66" rx="4" class="box"/>
+<text x="42" y="174"><tspan x="42" dy="0">Insert</tspan><tspan x="42" dy="17">bodyweight,</tspan><tspan x="42" dy="17">age etc.</tspan></text>
+<path d="M150,190 L250,190 L250,150" class="ln" marker-end="url(#arr)"/>
+<polygon points="250,52 310,101 250,150 190,101" class="box"/>
+<text x="250" y="90" class="s" text-anchor="middle"><tspan x="250" dy="0">Has</tspan><tspan x="250" dy="14">Str/Hyp.</tspan><tspan x="250" dy="14">Training?</tspan></text>
+<path d="M310,101 C350,101 360,72 412,72" class="ln" marker-end="url(#arr)"/>
+<text x="345" y="74" class="s"><tspan x="345" dy="0">Yes</tspan></text>
+<rect x="415" y="48" width="150" height="70" rx="4" class="box"/>
+<text x="427" y="70"><tspan x="427" dy="0">A bulk/cut like</tspan><tspan x="427" dy="17">approach would</tspan><tspan x="427" dy="17">be beneficial</tspan></text>
+<path d="M445,118 L445,150" class="dot"/>
+<path d="M420,152 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a7.7,7.7 0 0 1 15.5,0.0 a8.2,8.2 0 0 1 0.0,16.4 a8.2,8.2 0 0 1 0.0,16.4 a8.2,8.2 0 0 1 0.0,16.4 a8.2,8.2 0 0 1 0.0,16.4 a8.2,8.2 0 0 1 0.0,16.4 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a7.7,7.7 0 0 1 -15.5,0.0 a8.2,8.2 0 0 1 0.0,-16.4 a8.2,8.2 0 0 1 0.0,-16.4 a8.2,8.2 0 0 1 0.0,-16.4 a8.2,8.2 0 0 1 0.0,-16.4 a8.2,8.2 0 0 1 0.0,-16.4" class="ln"/>
+<text x="430" y="172" class="s"><tspan x="430" dy="0">“lean bulk / cut within</tspan><tspan x="430" dy="15">healthy limits &amp; depending</tspan><tspan x="430" dy="15">how user can handle</tspan><tspan x="430" dy="15">the stress”</tspan></text>
+<path d="M565,100 L600,110 L585,125 L620,140 L595,160 L625,180 L600,205 L630,230 L612,262" class="struck"/>
+<rect x="560" y="266" width="140" height="46" rx="4" class="struck"/>
+<text x="630" y="286" class="s g" text-anchor="middle"><tspan x="630" dy="0">Insert age,</tspan><tspan x="630" dy="15">weight etc.</tspan></text>
+<path d="M566,270 L694,308" class="struck"/>
+<path d="M566,308 L694,270" class="struck"/>
+<path d="M565,62 L735,62 L735,350" class="ln" marker-end="url(#arr)"/>
+<path d="M330,262 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.1,8.1 0 0 1 16.2,0.0 a8.2,8.2 0 0 1 0.0,16.5 a8.2,8.2 0 0 1 0.0,16.5 a8.2,8.2 0 0 1 0.0,16.5 a8.2,8.2 0 0 1 0.0,16.5 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.1,8.1 0 0 1 -16.2,0.0 a8.2,8.2 0 0 1 0.0,-16.5 a8.2,8.2 0 0 1 0.0,-16.5 a8.2,8.2 0 0 1 0.0,-16.5 a8.2,8.2 0 0 1 0.0,-16.5" class="ln"/>
+<text x="342" y="284" class="s"><tspan x="342" dy="0">We might have to argue a bit here</tspan><tspan x="342" dy="15">if we have evidence for a</tspan><tspan x="342" dy="15">better user path</tspan></text>
+<rect x="475" y="352" width="270" height="66" rx="4" class="box"/>
+<text x="487" y="378"><tspan x="487" dy="0">User agrees, or prefers a diet</tspan><tspan x="487" dy="18">maintaining bodyweight</tspan></text>
+<path d="M345,352 a8.3,8.3 0 0 1 16.7,0.0 a8.3,8.3 0 0 1 16.7,0.0 a8.3,8.3 0 0 1 16.7,0.0 a8.3,8.3 0 0 1 16.7,0.0 a8.3,8.3 0 0 1 16.7,0.0 a8.3,8.3 0 0 1 16.7,0.0 a7.7,7.7 0 0 1 0.0,15.3 a7.7,7.7 0 0 1 0.0,15.3 a7.7,7.7 0 0 1 0.0,15.3 a7.7,7.7 0 0 1 0.0,15.3 a7.7,7.7 0 0 1 0.0,15.3 a7.7,7.7 0 0 1 0.0,15.3 a8.3,8.3 0 0 1 -16.7,0.0 a8.3,8.3 0 0 1 -16.7,0.0 a8.3,8.3 0 0 1 -16.7,0.0 a8.3,8.3 0 0 1 -16.7,0.0 a8.3,8.3 0 0 1 -16.7,0.0 a8.3,8.3 0 0 1 -16.7,0.0 a7.7,7.7 0 0 1 0.0,-15.3 a7.7,7.7 0 0 1 0.0,-15.3 a7.7,7.7 0 0 1 0.0,-15.3 a7.7,7.7 0 0 1 0.0,-15.3 a7.7,7.7 0 0 1 0.0,-15.3 a7.7,7.7 0 0 1 0.0,-15.3" class="ln"/>
+<text x="353" y="372" class="s"><tspan x="353" dy="0">We have</tspan><tspan x="353" dy="15">enough info</tspan><tspan x="353" dy="15">to define</tspan><tspan x="353" dy="15">bodyweight</tspan><tspan x="353" dy="15">goal</tspan></text>
+<path d="M445,380 L475,380" class="dot"/>
+<path d="M280,126 C330,200 300,300 200,350 C150,375 140,400 140,440" class="ln" marker-end="url(#arr)"/>
+<text x="160" y="432" class="s"><tspan x="160" dy="0">No</tspan></text>
+<rect x="30" y="444" width="250" height="200" rx="4" class="box"/>
+<text x="44" y="470"><tspan x="44" dy="0">Similar to the other path, since</tspan><tspan x="44" dy="20">high protein helps with muscle.</tspan><tspan x="44" dy="20">Just also help the user find</tspan><tspan x="44" dy="20">Str/Hyp Training options, and</tspan><tspan x="44" dy="20">if that doesn't work, at least</tspan><tspan x="44" dy="20">physical activity options</tspan></text>
+<path d="M610,418 L610,488" class="ln" marker-end="url(#arr)"/>
+<text x="610" y="512" class="b" text-anchor="middle"><tspan x="610" dy="0">{“Bulk”, “Cut”, “Maintain”}</tspan><tspan x="610" dy="22">+ {high protein diet}</tspan></text>
+<path d="M150,644 C150,690 300,690 330,600 C345,555 400,505 430,505" class="ln" marker-end="url(#arr)"/>
+<path d="M410,562 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a7.9,7.9 0 0 1 15.7,0.0 a8.8,8.8 0 0 1 0.0,17.5 a8.8,8.8 0 0 1 0.0,17.5 a8.8,8.8 0 0 1 0.0,17.5 a8.8,8.8 0 0 1 0.0,17.5 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a7.9,7.9 0 0 1 -15.7,0.0 a8.8,8.8 0 0 1 0.0,-17.5 a8.8,8.8 0 0 1 0.0,-17.5 a8.8,8.8 0 0 1 0.0,-17.5 a8.8,8.8 0 0 1 0.0,-17.5" class="ln"/>
+<text x="422" y="586" class="s"><tspan x="422" dy="0">Have the ability to let the user require only</tspan><tspan x="422" dy="15">vegan-protein options through the dietitian</tspan><tspan x="422" dy="15">session</tspan></text>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 240" width="680" height="240" role="img" aria-label="Dietitian Room: locked state with gray plus button, padlock and weekly unlock bar; becomes the unlocked state with a colorful plus button">
+<title>Dietitian Room: locked state with gray plus button, padlock and weekly unlock bar; becomes the unlocked state with a colorful plus button</title>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1e40af"/>
+  </marker>
+</defs>
+<style>
+  text { font-family: Helvetica, Arial, sans-serif; fill: #1e40af; font-size: 14px; }
+  .s { font-size: 12px; }
+  .b { font-weight: bold; }
+  .g { fill: #9ca3af; }
+  .ln { fill: none; stroke: #1e40af; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .box { fill: none; stroke: #1e40af; stroke-width: 1.6; }
+  .dot { fill: none; stroke: #1e40af; stroke-width: 1.3; stroke-dasharray: 2 4; stroke-linecap: round; }
+  .struck { fill: none; stroke: #9ca3af; stroke-width: 1.4; stroke-dasharray: 5 4; }
+</style>
+<rect x="0.5" y="0.5" width="679" height="239" rx="10" fill="#fffef8" stroke="#e5e7eb"/>
+<rect x="110" y="30" width="340" height="40" rx="3" class="box"/>
+<text x="280" y="56" text-anchor="middle"><tspan x="280" dy="0">Dietitian Room</tspan></text>
+<rect x="110" y="76" width="340" height="9" fill="none" stroke="#1e40af" stroke-width="1.2"/>
+<rect x="110" y="76" width="112" height="9" fill="#1e40af" opacity="0.55"/>
+<path d="M158.57142857142856,76 L158.57142857142856,85" class="ln"/>
+<path d="M207.14285714285714,76 L207.14285714285714,85" class="ln"/>
+<path d="M255.71428571428572,76 L255.71428571428572,85" class="ln"/>
+<path d="M304.2857142857143,76 L304.2857142857143,85" class="ln"/>
+<path d="M352.8571428571429,76 L352.8571428571429,85" class="ln"/>
+<path d="M401.42857142857144,76 L401.42857142857144,85" class="ln"/>
+<path d="M222,80 L218,73" class="ln"/>
+<path d="M222,80 L227,74" class="ln"/>
+<path d="M222,80 L228,84" class="ln"/>
+<path d="M222,80 L219,87" class="ln"/>
+<path d="M222,80 L230,79" class="ln"/>
+<path d="M226,110 L222,92" class="ln" marker-end="url(#arr)"/>
+<text x="232" y="114" class="s"><tspan x="232" dy="0">sparks</tspan></text>
+<path d="M370,104 L366,90" class="ln" marker-end="url(#arr)"/>
+<text x="376" y="108" class="s"><tspan x="376" dy="0">easy view of remaining days</tspan><tspan x="376" dy="15">until able for a new one</tspan></text>
+<rect x="478" y="30" width="44" height="44" rx="3" fill="#e5e7eb" stroke="#1e40af" stroke-width="1.6"/>
+<path d="M488,30 L488,20 A12,12 0 0 1 512,20 L512,30" class="ln"/>
+<line x1="489" y1="52" x2="511" y2="52" stroke="#9ca3af" stroke-width="5" stroke-linecap="round"/><line x1="500" y1="41" x2="500" y2="63" stroke="#9ca3af" stroke-width="5" stroke-linecap="round"/>
+<path d="M580,52 L530,52" class="ln" marker-end="url(#arr)"/>
+<text x="586" y="57"><tspan x="586" dy="0">gray</tspan></text>
+<path d="M100,48 L80,48 L80,200 L100,200" class="ln" marker-end="url(#arr)"/>
+<text x="88" y="130" class="s"><tspan x="88" dy="0">same color, with</tspan><tspan x="88" dy="15">ability to enter</tspan></text>
+<rect x="110" y="180" width="340" height="40" rx="3" class="box"/>
+<text x="280" y="206" text-anchor="middle"><tspan x="280" dy="0">Dietitian Room</tspan></text>
+<rect x="478" y="178" width="44" height="44" rx="3" fill="#ecfdf5" stroke="#1e40af" stroke-width="1.6"/>
+<line x1="489" y1="200" x2="511" y2="200" stroke="#16a34a" stroke-width="5" stroke-linecap="round"/><line x1="500" y1="189" x2="500" y2="211" stroke="#16a34a" stroke-width="5" stroke-linecap="round"/>
+<path d="M580,200 L530,200" class="ln" marker-end="url(#arr)"/>
+<text x="586" y="205"><tspan x="586" dy="0">colorful</tspan></text>
+</svg>
