@@ -41,4 +41,5 @@
 
 - The council provides expert opinions. Each persona lives in its own subfolder of `administration/council/`, in a `persona.md` file with possible additional information next to it
 - The default persona is the software-architect, which also helps with my learning
+- Start every reply with a `# Speaking: <persona>` heading, e.g. `# Speaking: Software architect`. If other personas contributed, add a `Consulted: <persona>, <persona>` line below it
 - A task may spawn subagents with the personas it needs, e.g. for research
