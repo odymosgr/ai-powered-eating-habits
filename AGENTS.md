@@ -7,6 +7,12 @@
 - "The app's AI": the AI inside the app, a product feature. Not you
 - "The council": you, the agents helping me build the app, using the personas in `administration/council/`
 
+## Communication
+
+- Be brief. Report only what I can't see myself: decisions you made, open issues, surprises
+- Give an overview only for big changes we haven't discussed (a feature change, a refactor)
+- Don't explain commands, git output or file diffs. I'll ask if I need it
+
 ## Documentation and planning
 
 - Use md files for text. Ask for permission if there is a good reason for using other file types
