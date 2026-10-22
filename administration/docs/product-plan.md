@@ -1,554 +1,380 @@
 # AI-Powered Eating Habits — Product Plan
 
-**Status:** Organized concept, awaiting founder review before nutritional and behavioural critique.  
-**Date:** 7 October 2026.  
-**Suggested repository location:** `docs/product-plan.md`.  
-**Inputs:** The founder's complete concept message and the attached updated `README (1).md`.
+**Version 2, 21 Oct 2026.** Rewritten from the [paper notes](initial-notes/initial-notes.md) (6–15 Oct) and the 7 Oct plan. Where the notes changed their mind, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
+Council proposals, research gaps and open decisions are in [product-plan-review.md](product-plan-review.md). None of them are applied here.
 
-This document organizes the ideas without treating them as clinically validated claims, completed implementation decisions, or measured results. Open questions remain open. Proposed structural additions are identified explicitly.
+## Contents
 
-## 1. Product purpose and intended outcomes
+1. [Vision](#1-vision)
+2. [The habit model](#2-the-habit-model)
+3. [Logging](#3-logging)
+4. [Goals and progress](#4-goals-and-progress)
+5. [Onboarding](#5-onboarding)
+6. [The AI dietitian](#6-the-ai-dietitian)
+7. [Food supply](#7-food-supply)
+8. [Screens](#8-screens)
+9. [Scope](#9-scope)
+10. [Open questions](#10-open-questions)
 
-### Problem and approach
+## 1. Vision
 
-The intended users want to lose fat, build muscle, or improve their eating habits. The founder's approach is to modify existing habits with conversational guidance, rather than require a strict diet or detailed calorie-by-calorie entry.
+- **Why this project:** practice AI software engineering on a real product. A generic habit-visualization tool would be a logical pivot, but this app is the vehicle (p26).
+- **Problem:** most people want to lose fat, build muscle or eat healthier. Strict diets and calorie-exact logging are high friction; the lowest-friction path is to change the habits they already have.
+- **Selling point:** a clear view of your own eating habits, the easiest way to make someone change them (p26). Persuading through an AI is the harder, second layer ([§6](#6-the-ai-dietitian)).
+- **How it works:** users log their morning bodyweight and what they ate ([§3](#3-logging)). The app's AI turns each week of logs into habits scored against the user's goals ([§2](#2-the-habit-model), [§4](#4-goals-and-progress)). A weekly session with the AI dietitian turns that view into small changes toward healthier, cheaper alternatives ([§6](#6-the-ai-dietitian)).
+- **Outcomes for users:** reach their goal bodyweight; overcome a bad habit; food that costs less money and time, with less hunger, more energy and less brain fog; habits that fuel their exercise and recovery. Longshot: help overcome an eating disorder.
+- **Success metric:** progress toward the target bodyweight.
+- **Key risk:** users stop logging or stop engaging with the AI.
+- **Team:** solo. The council's personas stand in for a dietitian and a behavioural psychologist until the team grows.
 
-The product is a mobile-first chatbot. Users log their morning bodyweight and describe what they ate, primarily through voice. Camera input is a later addition. The app uses these records to identify recurring habits and suggest changes that fit the user's circumstances.
+## 2. The habit model
 
-The updated README describes this as the simplest, lowest-friction approach and a low-cost solution. These are product hypotheses to investigate, not established comparisons.
+_Notes: p2–3, p6, p8, p11, p21–22._
 
-### Intended outcomes
+### 2.1 Habit loop
 
-- Move toward the user's target bodyweight.
-- Help replace an unwanted eating habit.
-- Reduce the money and time required by the user's food habits.
-- Improve satisfaction with meals and reduce unwanted hunger.
-- Support energy needs and recovery associated with exercise.
-- Support continued progress and maintenance with less logging effort.
-- Add liquid intake and hydration after the MVP.
+```mermaid
+flowchart LR
+    T["Trigger"] --> H["Habit: eating a meal"] --> R["Reward"]
+```
 
-**Longer-term clinical idea retained from the README:** potentially helping someone overcome an eating disorder. This remains a separate clinical and regulatory question, not an approved launch feature or supported treatment claim.
+The ideal trigger is "to eat healthy and for my goals": the user's logic guides (changes, overrides, defines) their habits.
 
-### Ownership
+### 2.2 A habit
 
-The founder currently owns product, engineering, design, research, and business decisions. The README describes a solo project, potentially adding a dietitian, behavioural psychologist, and a larger team as it grows.
-
-The current reliance on LLM assistance is retained as a working approach. Whether and when qualified professionals review the product remains an open decision.
-
-## 2. Behavioural framework: trigger, routine, reward
-
-The habit loop is the proposed organizing framework for understanding recurring eating behaviour.
-
-### 2.1 Triggers
-
-A meal or eating event may have one or several triggers:
-
-| Trigger category | Examples of information to capture |
+| Part | Definition |
 | --- | --- |
-| Time | Time of day, recurring meal time, schedule |
-| Situation | A recurring circumstance surrounding eating |
-| Environment | Place, available food, social setting |
-| Emotion | A user-described emotional state preceding eating |
+| Main trigger | Time of day. It is the base of most diets and defines hunger, which is itself a habit: it comes at the times you're used to eating |
+| Contextual triggers | Place, company, before/during/after an event, emotion, or anything else the AI finds. Sometimes they define a habit more than the time does |
+| Common meals | 1–5 meals the AI summarizes from those logged under the trigger, each with average calories and macros from the user's history and a usefulness score ([§4.3](#43-usefulness)) |
+| Rewards | Main: usefulness toward the user's goals. Others found by analysis: no hunger (though through fasting, hunger can be a friend), pleasure of eating, pleasure of the setting or company, coping with an emotion |
 
-The concrete categories and questions still need to be defined.
+Trigger examples: on my way to work · alone at night (loneliness) · before working out · in the morning · when I'm with Mike · at the office lounge.
 
-### 2.2 Routine: what and how the user eats
+### 2.3 Weekly habit view
 
-The routine includes:
+Each week the AI defines the user's 3–5 major habits. A week is the smallest window. The first analysis comes at the end of the onboarding week; a month gives a clearer picture.
 
-- Food or meal eaten.
-- Meal size or quantity.
-- Potentially how it was eaten, such as rushing.
-- Relevant context, such as anxiety associated with a rushed meal.
-- Cost, if saving money is a user goal.
-- Potential nutritional estimates and diet compatibility tags.
+- **Usefulness score:** [§4.3](#43-usefulness).
+- **Diet-defining percentage (d.d.p.):** the share of the week's calories a habit covers, kcal(habit) / kcal(week). Five non-overlapping habits covering the whole diet are 20% each, so 20% is already major. Shown ×5: 20% → 100, "important".
+- **Habit overlap:** a meal can belong to two habits and be counted twice; keep overlap minimal. It's measured in calories and is asymmetric: overlap(A→B) = kcal(A ∩ B) / kcal(A).
 
-### 2.3 Reward: what the behaviour provides
+![Meal map: a week of meals, Habit 1 as a straight line, Habit 2 as a wavy line](initial-notes/initial-notes-diagrams/p21-meal-map.svg)
 
-The founder groups rewards into avoiding discomfort and seeking pleasure:
+In this example Habit 1 overlaps Habit 2 by 20%, and Habit 2 overlaps Habit 1 by 15%.
 
-| Reward group | Proposed examples |
+### 2.4 Habit trends
+
+Comparing week X with week X+1, a habit is:
+
+- **Same:** usefulness stable.
+- **Changed:** same trigger, different meal, big usefulness change. "When I have cravings at home": sweets → fruit.
+- **Eliminated:** its trendline stops.
+- **Emerged:** a new trendline starts.
+
+Trends are goal-dependent and need several weeks. Weeks analysed under older goals stay visible but marked as goal-mismatched (gray or shadow overlay), with goal-change moments shown and older goals viewable on click. Maybe also re-view trends through an older goal's lens (costly compute and storage).
+
+### 2.5 User phases
+
+```mermaid
+flowchart LR
+    OB["Onboarding<br/>1 week, logging only"] --> CH["Changing<br/>weekly sessions"] --> MA["Maintenance<br/>no new changes"]
+    MA -.-> CH
+```
+
+Maintenance needs research. Candidate ideas from the 7 Oct plan: meal logging drops to weekly, bodyweight stays daily plus a weekly questionnaire, interaction frequency adapts to the user.
+
+## 3. Logging
+
+_Notes: p0, p4–5, p7, p9–10, p12, p18, p28._
+
+### 3.1 Bodyweight
+
+- Measured in the morning, after a full night's sleep and a possible toilet trip. Daily fluctuations are expected and must not discourage the user.
+- Entered in the Bodyweight Room or through chat.
+- A scale is optional ([§6.3](#63-limiting-dietitian-beliefs)).
+
+### 3.2 Meals
+
+- **Input:**
+  - Voice: more description gives the AI more to work with, but costs effort and can be awkward in front of people. Once the AI understands the user's habits, offer no-voice options.
+  - Text, through the input field or chat.
+  - Photo: better UX, but little context, plus storage and processing cost (open, [§10](#10-open-questions)).
+  - Common meals: quick logging from a page inside the meal logger, updated weekly, with history.
+- **When:** ideally right after eating, so the log time is enough. Or roughly, for a whole day, at its end.
+- **Clarifications:** the AI may ask for more information, or propose assumptions the user can delete. Both carry **communication risk (ComRisk)**: the chance that the AI's questions or assumptions burden users enough to disengage. Users can switch them off, or give the AI direct orders.
+
+### 3.3 Days
+
+- A day runs 04:00–04:00 in the user's timezone, defined by sleep. For unstable sleepers, contextual anchors ("when I wake up", "before work", "at lunchtime") keep the app useful. Onboarding asks about sleep stability (and stomach).
+- Parts of the day: morning · lunchtime · afternoon · night · midnight.
+- The **day page** shows the day's events in strict order. Users can reorder them; leaving without saving asks for confirmation.
+
+### 3.4 Meal event
+
+One eating occasion, made of one or more **items** (parts better logged separately).
+
+| Field | Content |
 | --- | --- |
-| Relief from discomfort | Relief from hunger |
-| Emotional coping | Relief from, or distraction from, a negative emotion |
-| Food enjoyment | Taste and enjoyment of eating |
-| Environmental enjoyment | Enjoyment associated with the setting |
-| Social enjoyment | Socialization associated with eating |
+| Time | Part of the day, plus the log timestamp |
+| Name | User-given. May inform a future global meal DB |
+| Size | Snack: small plate or handful < Normal: large plate < Large: heavy large plate, or large with a side < XL: until the stomach can't take more |
+| Nutrition | Calories, protein, fat, carbs. AI estimates, good enough for guidance |
+| Context | Place, company, emotion, way of eating (rushed, slow, mindful), each with a confidence: stated by the user ⟷ inferred from habit trends or otherwise |
+| Supply | Where the food came from, and whether the user controls it or others are involved |
+| Price, prep time | Rough estimates, only if relevant to the user. Prep time excludes shopping |
+| Goal value | Diet adherence under the goals at that time ([§4.3](#43-usefulness)) |
 
-**Perspective retained for later critique:** the founder suggests that fasting might change one's relationship with hunger, described as learning that “hunger is a friend.” This is a topic to evaluate, not advice generated by this plan.
+Each snacking occasion is its own event, so stacked snacks stay visible. A snack multiplier (1 · 2 · 3 · too many) counts portions within one.
 
-### 2.4 Product-added reinforcement
+### 3.5 Data at a glance
 
-The product may introduce additional rewards or feedback:
+```mermaid
+erDiagram
+    USER ||--o{ BODYWEIGHT_ENTRY : logs
+    USER ||--o{ MEAL_EVENT : logs
+    MEAL_EVENT ||--|{ ITEM : contains
+    MEAL_EVENT ||--o{ CONTEXT_INFO : has
+    USER ||--o{ GOAL : prioritizes
+    USER ||--o{ HABIT : "has 3-5 a week"
+    HABIT }o--o{ MEAL_EVENT : covers
+    HABIT ||--|{ COMMON_MEAL : "summarized as 1-5"
+    USER ||--o{ SESSION : "has weekly"
+    SESSION ||--|{ COMMITMENT : "produces 1-5"
+    USER ||--o{ LIMITING_BELIEF : sets
+```
 
-- Progress toward a bodyweight goal.
-- Successful daily logging.
-- Weekly logging or reviews after goals are reached.
-- Daily bodyweight logging combined with a weekly questionnaire.
-- Daily hydration goals in a later version.
+A commitment is either a habit change or a supply to-do ([§7](#7-food-supply)).
 
-The relationship between these product rewards and the original reward from eating remains to be designed.
+## 4. Goals and progress
 
-## 3. Information associated with a meal
+_Notes: p10, p19–20, p23–25, p27._
 
-Meals may contain incomplete information. Missing fields should remain representable.
+### 4.1 Goals
 
-| Information group | Proposed contents |
+Goals have a strict priority order agreed with the user: by default 1 > 2 > 3, reordered by drag and drop.
+
+1. **Bodyweight:** healthy increase, healthy decrease, or stable.
+2. **Diet adherence:** follow a diet ([§4.4](#44-diet-rules)). MVP: low carb (for fat loss) and high protein (for muscle growth).
+3. **Custom goal** (later): one free-text goal, e.g. a user-defined diet or meal cost. The AI judges meals and habits against a baseline, the first week's logs. It must state a single goal and must not be a security risk.
+
+- Goals change at most once a week, and only the last week's goal values are recalculated: recalculating older weeks is costly, and scarcity builds commitment.
+- The bodyweight direction gets the wording the user prefers, picked from a predefined table, stored with the user and used by the AI whenever it talks to them. It changes with the goal.
+
+  | Direction | Wording options |
+  | --- | --- |
+  | Surplus | "calorie surplus", "lean bulk" |
+  | Deficit | "calorie deficit", "leaning phase", "cut", "fat loss" |
+  | Maintenance | "stable", "maingaining" |
+
+- A **goals page** shows the goals and their order.
+
+### 4.2 Measuring progress
+
+- **Hard** measurement: bodyweight. **Soft** measurement: calorie intake from the logs. Together they give a good idea of daily expenditure.
+- During the onboarding week bodyweight is assumed stable (users are asked not to change habits, partly for this), so average logged intake ≈ expenditure. The week also gives the average number of meals per day.
+- Bodyweight goal + this baseline → a **daily calorie goal**. There is no per-meal calorie goal.
+
+### 4.3 Usefulness
+
+Each goal weighs twice the next: w₁ = 2·w₂ = 4·w₃ and Σw = 1, i.e. 4/7, 2/7, 1/7 (2/3, 1/3 with two goals). Usefulness is the weighted sum over goals. **In the MVP, usefulness covers calories and diet adherence.**
+
+| Goal | Meal | Day / week | Habit |
+| --- | --- | --- | --- |
+| Bodyweight | Later: needs the day's running calories | Calories vs daily calorie goal | Does it push toward over- or undereating? |
+| Diet adherence | Do the diet's rules hold? | Same | Same |
+| Custom (later) | AI judgment vs baseline | Same | Same |
+
+Custom goals are the big unknown. Diet-like ones are easy; cost-like ones need rough meal prices and guardrails (never suggest abusing a relationship for free food).
+
+### 4.4 Diet rules
+
+Every rule needs study references before use ([§6.4](#64-library)). Metric units first.
+
+- **Why macros matter:** protein and fat give satiety; fat must stay above zero for hormonal health; carbs give daily energy and training fuel, and may help anabolism (insulin, full glycogen stores); calories drive bodyweight.
+- **High protein ("hp"):** building muscle needs training, and quality training needs energy, so: high protein with enough carbs.
+
+  | hp diet | Amount |
+  | --- | --- |
+  | Protein | 1.8 g/kg/day (?), e.g. 82 kg → ~150 g |
+  | Fat | 0.65 g/kg/day |
+  | Carbs | ≥ 100 g/day (uncertain reading) |
+  | Progress | +0.25–0.5% bodyweight/week. Rule of thumb: +275 kcal/day ≈ +0.25 kg/week |
+
+- **Low carb:** lower daily carbs gradually while the user can sustain the lower energy and the cravings. After the first hurdle (~1 week) the body finds a new equilibrium; sustained for ~1 month, it's easy to return to after a relapse. Tool: a daily carb allowance.
+
+## 5. Onboarding
+
+_Notes: p11, p15–19._
+
+```mermaid
+flowchart TD
+    C["Pick a card: Build Muscle, Lose Fat or Improve Eating Habits"] --> P["Path questions"]
+    P --> S["Basic stats"]
+    S --> A["Enter the app: only the onboarding session is open"]
+    A --> O["Onboarding session with the AI dietitian"]
+    O --> W["Onboarding week of logging"]
+    W --> F["First weekly session unlocks"]
+```
+
+- **Asked along the way:** is a scale within reach on waking (asked first); sleep stability (and stomach); food supply habits and who else shapes them; deeper goals, e.g. lose fat → an upcoming wedding, build muscle → be more attractive or unlock athletic potential.
+- **Basic stats:** age; gender (male, female, other / prefer not to say); height; bodyweight, a rough estimate if no scale is at hand. Gathered at the end for better UX (p15), though the Build Muscle sketch asks first (p17).
+- **Onboarding session:** clarify goals; define current problems (a sales step); set expectations (initial logging, a preview of what follows); commit to next steps (daily bodyweight and meal logging).
+
+### 5.1 Build Muscle path
+
+```mermaid
+flowchart TD
+    S(["Build Muscle"]) --> T{"Does strength or<br/>hypertrophy training?"}
+    T -- Yes --> B["A lean bulk or cut, within healthy limits<br/>and the stress the user can handle"]
+    B --> A["User agrees, or prefers to maintain bodyweight.<br/>Argue a bit if evidence favours a better path"]
+    A --> G["Goal: Bulk, Cut or Maintain<br/>+ high-protein diet"]
+    T -- No --> N["Same, since high protein helps muscle.<br/>Also help find strength/hypertrophy training,<br/>or at least a physical activity"]
+    N --> G
+```
+
+- The AI explains that diet helps, but proper strength or hypertrophy training is necessary; for beginners, even 2 full-body sessions a week (assumption). Training can't be supervised, so claims stay careful and come only from double-checked ones ([§6.4](#64-library)).
+- Learn the user's minimum weekly activity sessions, and whether they are strength/hypertrophy.
+- Users can require vegan-only protein options through a dietitian session.
+
+### 5.2 Lose Fat path
+
+Like Build Muscle, but the only acceptable outcomes are "cut" or "maintain with strength/hypertrophy training". Otherwise the AI insists on a realistic outcome that isn't "lose fat".
+
+### 5.3 Improve Eating Habits path
+
+Not defined yet.
+
+### 5.4 Physical activity
+
+- Always recommended: its benefits beat any pill. The AI can propose joining a gym, dance studio, martial arts class or hiking community, or at least a long-walk habit (mainly psychological benefits). A physical job counts.
+- The user has the final say and can opt out for good ([§6.3](#63-limiting-dietitian-beliefs)).
+
+## 6. The AI dietitian
+
+_Notes: p10–13, p16, p18, p27, p30._
+
+The app's AI acting as the user's personal dietitian, with expert dietitian, behavioural-psychology and sales knowledge.
+
+### 6.1 Comment on every log
+
+| Phase | Comment |
 | --- | --- |
-| Meal description | What was eaten; level of descriptive detail |
-| Size | Snack, normal, large, or an extreme-size category |
-| Timing | Time eaten, or an approximate description for retrospective entries |
-| Context | Situation, environment, social setting, emotional context |
-| Eating process | Optional information about how the meal was eaten, including rushing |
-| Trigger | One or more potential trigger categories |
-| Reward | Reported or probable reason/reward associated with eating |
-| Price | Optional meal cost when relevant to saving money |
-| Nutrition | Rough calories and macronutrient estimates |
-| Uncertainty | Missing information and possible accuracy/confidence information |
-| Diet compatibility | One or more diet or custom-category labels |
+| Onboarding | Thank them and encourage logging, with no judgment; a random message |
+| Changing | Congratulate applied changes. When they fall short: be kind, show you noticed, offer a guilt-free way to log the reason and, if appropriate, solutions for next time |
+| Maintenance | Probably like onboarding |
 
-### 3.1 Meal-size vocabulary
+### 6.2 Weekly session
 
-The founder proposes:
+- One a week, for scarcity and realistic cooperation; the first comes after onboarding ([§5](#5-onboarding)).
+- Before starting, the AI asks the user to be somewhere comfortable, with enough time for an important conversation.
+- **Agenda:**
+  1. Food supply habits: the highest-impact decisions ([§7](#7-food-supply)).
+  2. Tactics: the most detrimental habits with the lowest-cost changes. Always prefer cheap options that fit the user's goals. Keep the timing and substitute the meal, within a similar taste palette. For variety, point to places to find alternatives. Use high-modifiability meals for step-by-step change or easy variation, e.g. a yogurt base (dessert-style with chocolate flakes, or with oats or fruit), or pasta as a cheap base.
+- **Conversation rules:** prevent objections before recommending; keep messages short; ask for agreement before moving on, leaving room to object; handle objections; when useful, remind users of their ideal outcome and deeper goals.
+- **Outcome:** 1–5 habit changes the user explicitly commits to for the next week. If unsure, they commit only to what they're certain of, but to at least one. The commitments are summarized at the top of the homepage.
+- Advice involving other people (e.g. sharing your goals with your partner and asking for help) needs tact and strict guardrails.
 
-- **Snack:** a small eating event; concern that repeated snacking could contribute to unwanted overeating.
-- **Normal:** a usual meal.
-- **Large:** a larger meal.
-- **Tiny:** an extreme small-size category; possibly equivalent to snack, still undecided.
-- **XXL:** an extreme large-size category, originally described as eating until the stomach cannot take more.
+### 6.3 Limiting dietitian beliefs
 
-These are initial labels. Their definitions and the relationship between size and meal type are pending the later critique.
+Explicit rules users set for the AI, like "never ask me about exercise again" or "I don't use a scale". Listed in settings and undoable there; users are told so. Some hide features (workouts). For important ones the AI argues before accepting, e.g. the scale, the main progress measure.
 
-### 3.2 Nutrition hypotheses to evaluate
+### 6.4 Library
 
-The founder proposes rough AI-inferred calories and macros for these purposes:
+Small, important, memorable. It holds the double-checked claims, with study references, that the AI can use cheaply. Sections, one colour each: general dietary knowledge · habit-loop knowledge · major diets.
 
-| Measure | Proposed rationale |
+## 7. Food supply
+
+_Notes: p5, p12–14, p29._
+
+> "Best **place** to control a problem is **at** its source." ~Bboy Heavy Metal, 15.10.2026
+
+- Supermarket and other supply habits are the "biggest battle" and the session's first topic.
+- **Supply page** (cart button): mostly read-only. Shows the supply habits from onboarding, noting where other people shape them (usually saving time or money). Changes only through dietitian sessions.
+- At its top, a **to-do list** of agreed changes, each marked done after a confirmation prompt:
+  - [ ] Next time at the supermarket, buy fruit instead of sweets, to eat freely when cravings hit
+  - [ ] Bring a homemade protein shake to university, since the lounge has no high-protein meals
+- To-dos also float on the homepage as advice bubbles ([§8](#8-screens)).
+
+## 8. Screens
+
+_Notes: p13–14, p29–31._ Mobile first; UX takes priority.
+
+### 8.1 Homepage
+
+| Element | Behaviour |
 | --- | --- |
-| Calories | Relate food intake to bodyweight outcomes |
-| Protein and fat | Sustenance/satiety |
-| Fat | Hormonal health |
-| Carbohydrates | Energy for people with demanding mental or physical work |
-
-These rationales are preserved as hypotheses for nutritional review. The table does not validate their completeness, accuracy, or suitability for individual advice.
-
-### 3.3 Brain fog and related context
-
-A possible future research area is a “brain-fog danger level” associated with food. The founder explicitly notes that this needs its own research and that exercise may also be relevant.
-
-Whether this becomes a feature, what it measures, and whether reliable individual predictions are possible are undecided.
-
-### 3.4 Diet compatibility: working name “Brand”
-
-“Brand” currently means dietary compatibility or category membership, rather than a commercial food brand.
-
-Examples include:
-
-- Established diet categories, such as keto.
-- User-defined or playful categories, such as “all foods starting with L,” including the founder's “L for loser” example.
-
-Definitions, assignment criteria, user control, and the relationship between tagging and actual recommendations remain open.
-
-## 4. Input methods, friction, and timing
-
-### 4.1 Bodyweight input
-
-Bodyweight can be entered:
-
-- In a dedicated input field.
-- Through chat.
-- Through a bodyweight page/screen reached from a weight icon on the homepage.
-
-Morning bodyweight is the proposed default routine.
-
-### 4.2 Food input
-
-**Primary interaction:** the user describes food through voice.
-
-Users may provide:
-
-- A brief description with substantial missing information.
-- A detailed description with more information available to the AI.
-
-More detail may help interpretation but increases user effort. Speaking at length may be inconvenient or uncomfortable in front of other people.
-
-Later input options include:
-
-- Camera/photos.
-- Buttons for frequent or already-understood meals and habits.
-
-The input field/chat also provides a text-based interaction. The final supported input combination for the prototype is to be confirmed.
-
-### 4.3 Immediate and retrospective logging
-
-The app supports two intended patterns:
-
-1. **Immediate logging:** describe a meal when eating it; the current time is the proposed default.
-2. **End-of-day logging:** describe several meals or roughly the entire day later, including general time descriptions.
-
-Users spending the day around others may prefer retrospective logging.
-
-**Proposed structural clarification:** distinguish `logged_at` from `eaten_at`. A late entry should not automatically imply a late meal. Approximate meal times and unknown times should be representable. This is a proposed data-design detail, not an already-selected database implementation.
-
-## 5. AI interaction and Communication Risk (ComRisk)
-
-**Working definition:** ComRisk is the chance that the AI's questions, assumptions, or requests for correction impose enough burden to discourage engagement. Its exact definition and measurement are still open.
-
-### 5.1 Clarification
-
-After a meal or daily summary is logged, the AI may ask for additional information.
-
-Open design choices include:
-
-- Which missing information warrants a question.
-- When an incomplete entry is sufficient.
-- How much additional communication the user accepts.
-- Whether clarification is immediate or deferred.
-
-### 5.2 Assumptions and user control
-
-The founder proposes presenting assumptions that the user can remove or reject. This also carries ComRisk.
-
-The product should accommodate users who:
-
-- Accept inferred information.
-- Prefer to review or delete assumptions.
-- Disable assumption-related interactions.
-- Directly instruct the AI not to make assumptions.
-
-The original phrase **“propose assumptions for deletion”** is retained as an unresolved wording question. The interpretation above is a draft; confirm whether it means displaying inferred details for removal, or a different interaction.
-
-**Proposed structural clarification:** keep reported information, inferred values, confirmed values, rejected assumptions, and unknown information distinguishable. The implementation and default policy are not yet chosen.
-
-### 5.3 Analysis and recommendation responsibilities
-
-The proposed AI responsibilities are:
-
-- Interpret meal or daily descriptions.
-- Associate information with the appropriate eating events.
-- Ask for useful missing information where appropriate.
-- Handle assumptions according to user preferences.
-- Analyze recurring patterns across the log.
-- Produce weekly habit analysis and candidate habit changes.
-- Suggest alternatives compatible with the user's goals and circumstances.
-
-This does not yet determine whether the implementation uses direct model calls, a fixed workflow, tools, RAG, or an autonomous agent.
-
-## 6. Main user flows
-
-### Flow A: Onboarding
-
-1. Establish user goals and relevant preferences.
-2. Explain the logging interaction and assumption controls.
-3. Log meals and bodyweight during the initial observation period.
-4. Build an initial picture of recurring habits.
-5. Make habit analysis and recommendations available according to the eventual onboarding/access policy.
-
-The updated README proposes **one week** of onboarding. The concept message also refers to the “first weeks.” The exact duration and completion criteria remain open.
-
-Supermarket habits are intended to be discussed during onboarding in a later version, while the fuller supermarket feature is outside the prototype.
-
-### Flow B: Bodyweight logging
-
-1. Open the weight screen from the homepage, use its input field, or enter weight through chat.
-2. Record the measurement.
-3. Associate it with progress toward the user's goal.
-
-The preferred interaction, measurement details, and interpretation of progress remain to be specified.
-
-### Flow C: Log one meal
-
-1. Describe a meal through voice or another supported input.
-2. Interpret the description, allowing incomplete information.
-3. Resolve timing using the immediate-logging default or supplied meal time.
-4. Ask a clarification question if appropriate.
-5. Present or handle assumptions according to the user's preference.
-6. Save the meal and associated information.
-7. Provide guidance according to the onboarding and recommendation policy.
-
-### Flow D: Log a whole day
-
-1. Describe several meals or the day as a whole.
-2. Include broad time descriptions.
-3. Associate the information with separate meals where possible.
-4. Apply clarification and assumption preferences.
-5. Save the available information even if some details remain missing.
-6. Use the entries for subsequent habit analysis.
-
-### Flow E: Weekly habit analysis and changes
-
-1. Review recurring eating patterns across the user's log.
-2. Identify candidate triggers, routines, and rewards.
-3. Produce a weekly habit summary and/or candidate habits to adopt.
-4. Suggest similar, practical replacements.
-5. Judge the usefulness of recommendations through subsequent results.
-
-“Habit creation” may mean identifying an existing pattern, creating a reusable habit record, or proposing a new behaviour. These outputs need separate definitions.
-
-### Flow F: Maintenance
-
-Once the user reaches their goals, candidate approaches include:
-
-- Reduce meal logging to weekly.
-- Continue daily bodyweight entry with a weekly questionnaire.
-- Adjust interaction frequency to the user's needs.
-- Add hydration goals when that feature exists.
-
-The switching criteria and maintenance questionnaire remain open.
-
-### Flow G: Complaints and feedback — later
-
-Provide a chat-like support service with tickets and low response times for complaints and product feedback.
-
-The founder places the fuller service outside the MVP. Its workflow, staffing, and response-time promise remain undecided.
-
-## 7. Recommendation strategies
-
-### 7.1 Supermarket habits
-
-The founder identifies supermarket behaviour as potentially the “biggest battle,” because purchasing affects what food is available.
-
-- Eventually capture relevant shopping patterns during onboarding.
-- Develop shopping-related recommendations.
-- Keep the fuller feature outside the current prototype.
-- Explore the feature more deeply later.
-
-### 7.2 Similar but better habits
-
-Recommend alternatives close to the existing habit so that replacement is easier.
-
-The meaning of “better” depends on the user's goals: bodyweight, satisfaction, budget, time, exercise needs, or other agreed criteria.
-
-### 7.3 Meals with high modifiability
-
-For users able and willing to maintain a relatively steady diet, explore meals that can be adjusted gradually.
-
-The founder's intended benefits are:
-
-- Freedom to move gradually toward goals.
-- Variety through different ingredients or quantities.
-- Less staleness.
-- More manageable alternatives to unwanted habits.
-
-Example: use yogurt as a shared base for both a dessert-style option with chocolate flakes and a version with oats or fruit.
-
-Whether this strategy is appropriate should be judged through results.
-
-### 7.4 Candidate meal bases
-
-| Meal base | Founder rationale |
+| Weekly commitments | At the top ([§6.2](#62-weekly-session)) |
+| Settings gear | Account info, limiting dietitian beliefs, the rest |
+| Advice bubbles | Animated and floating. Hold → more info and actions (mark done, go to its page). Tap 4× → a fun destruction, replaced by a different bubble. Users do both once at sign-up. Outline colour = source (below) |
+| Dietitian Room | New-session button: gray and locked, with a weekly unlock bar showing the days left; colourful when open |
+| Meal Log | Big button beneath the Dietitian Room |
+| Bodyweight Room | Small scale button, two states: logged today or not |
+| Library | Small book button |
+| Supply | Small cart button, one state |
+
+![Dietitian Room: locked gray state with weekly unlock bar, then unlocked colorful state](initial-notes/initial-notes-diagrams/p30-dietitian-room.svg)
+
+Advice bubble sources:
+
+- **Library:** general and habit knowledge, rules of thumb.
+- **Scale:** "log your weight for the day! :D", plus positive goal-related messages. Now and then, harsher facts from the dietitian when necessary.
+- **Dietitian:** diet-adherence advice; personal reminders from sessions.
+- **Meal log:** "don't forget to log your meals today! :D"
+- **Supply:** personalized supermarket advice.
+- **Menstrual cycle** (female users): in the MVP only one general advice: the cycle can shift bodyweight noticeably, so keep weighing.
+
+The tone stays positive, with a smiley that reads friendly to everyone.
+
+### 8.2 App map
+
+Dotted: placement not decided in the notes.
+
+```mermaid
+flowchart LR
+    H["Homepage"] --> D["Dietitian Room"]
+    H --> M["Meal Log"]
+    H --> B["Bodyweight Room"]
+    H --> L["Library"]
+    H --> S["Supply page"]
+    H --> SE["Settings"]
+    M --> CM["Common meals"]
+    M --> HT["Habit history and trends"]
+    M -.-> DP["Day page"]
+    SE --> LB["Limiting dietitian beliefs"]
+    H -.-> G["Goals page"]
+```
+
+## 9. Scope
+
+### 9.1 MVP
+
+Everything in sections 1–8, except what 9.2 lists.
+
+### 9.2 Later
+
+| Area | Items |
 | --- | --- |
-| Yogurt | High-protein potential, variable fat content, many add-ons, and Greek commercial/affiliate relevance |
-| Pasta | Cheap meal base with many variation options |
+| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; a global meal DB |
+| Goals | Custom goal; keto; per-meal bodyweight usefulness; a workout-rules section on the goals page; imperial units |
+| AI dietitian | A user-chosen character; a short per-user md file defining how the AI speaks; a recipe book |
+| Screens | Exercise page (works like the supply page) and exercise advice; menstrual-cycle tracking and advice; hydration entry point; a brief app overview after onboarding |
+| Support | Complaint service: chat-like, with requests |
 
-The nutritional value and fit depend on the specific product, ingredients, quantities, and individual context; detailed assessment is deferred to critique.
+### 9.3 Parked until a prototype exists
 
-## 8. Conceptual data model
+- **Monetization:** a 1-month free trial with visible results by its end; paying to unlock analysis after the onboarding week, with a discounted first payment (or a cheaper first 6–12 months); goals locked during the trial unless buying; affiliate income (yogurt, food places).
+- **Legal:** advice involving other people; health claims; the 7 Oct plan's Greece/EU checklist (§12 of `git show 83026e4:administration/docs/product-plan.md`).
 
-The founder's starting concept is a user database organized around meals eaten each day, with possibly incomplete fields such as time, environment, size, probable reward, and guessed macros.
+## 10. Open questions
 
-**Proposed structural addition:** separate individual events from patterns inferred across events.
-
-| Record type | Proposed purpose |
-| --- | --- |
-| User profile | Goals, relevant preferences, optional budget goals, and assumption/communication settings |
-| Meal event | One eating event and its available details |
-| Bodyweight measurement | A dated weight entry |
-| Daily view | Meals associated with a day; exact representation undecided |
-| Habit record | A recurring pattern and the meals supporting it |
-| Recommendation | A proposed habit change and its rationale |
-| Review/check-in | Weekly progress or maintenance information |
-| Hydration record | Later liquid-intake feature |
-| Support ticket | Later complaints/feedback service |
-
-These are conceptual entities, not a finalized schema or a commitment to a database provider.
-
-For estimates, the founder suggests possible accuracy metrics. Whether to store ranges, qualitative confidence, measured errors, or another representation is undecided. No numerical accuracy claim has been established.
-
-## 9. Scope and commercial ideas
-
-### 9.1 Proposed prototype/MVP core
-
-The concept points toward:
-
-- Mobile-first interaction.
-- Meal logging, primarily through voice, with chat/input support.
-- Bodyweight logging.
-- Single-meal and rough whole-day entry.
-- Incomplete meal records.
-- User-controlled clarification and assumptions.
-- An initial onboarding/observation period.
-- Weekly pattern analysis and candidate habit changes.
-- Similar alternative recommendations.
-
-This is an organization of the intended core, not a finalized implementation commitment. Voice effort, batching, timing, and recommendation timing still need explicit scope decisions.
-
-### 9.2 Explicitly later or outside the prototype
-
-- Camera/photo logging.
-- Habit or frequent-meal shortcut buttons.
-- Fuller supermarket-habit support.
-- Liquid intake and hydration goals.
-- Fuller support chat and ticket service.
-
-### 9.3 Scope still unresolved
-
-- Brain-fog prediction or scoring.
-- Custom-diet functionality beyond basic labels.
-- Exactly which maintenance flow belongs in the first release.
-- How much recommendation functionality belongs in the prototype.
-- Any clinical/eating-disorder functionality.
-
-### 9.4 Pricing and monetization
-
-Ideas retained from the message and README:
-
-- A free trial ending after approximately **one month**.
-- Aim to demonstrate tangible, visible value during that month.
-- Possibly lock habit analysis/creation during onboarding.
-- Possibly charge to unlock features.
-- Possibly discount the first payment.
-- Possible affiliate revenue, particularly around yogurt and related products.
-
-The access policy, trial/payment details, pricing, and commercial relationships are undecided. Visible results within a month are an intended validation target, not a promised outcome.
-
-## 10. Open decisions and research register
-
-| Topic | Decision or research needed |
-| --- | --- |
-| Intended users | Specify the first target group and supported goals |
-| Onboarding | One week versus longer; what makes the initial picture sufficient? |
-| Recommendation access | Waiting period, paywall, or both? |
-| Meal sizing | Define labels and decide whether tiny differs from snack |
-| Clarification | Decide which missing details justify asking |
-| Assumptions | Define defaults, strict mode, and the meaning of “propose assumptions for deletion” |
-| ComRisk | Define and measure communication burden |
-| Retrospective entries | Decide how to handle approximate, uncertain, or absent meal times |
-| Habit output | Distinguish pattern detection, reusable records, and new behaviour suggestions |
-| Nutrition | Review the calories/macros rationales and estimate reliability |
-| Reward | Review hunger, emotional coping, pleasure, and the fasting-related perspective |
-| Brain fog | Research feasibility and the relevance of exercise/context |
-| Diet tags | Define compatibility and user-created categories |
-| High-modifiability meals | Determine suitability and how results will judge recommendations |
-| Maintenance | Define switching criteria, frequency, and questionnaire |
-| Commercial model | Trial, unlock policy, first-payment discount, affiliate disclosure |
-| Clinical boundary | Decide intended purpose before making treatment-related claims |
-| Prior work | Continue the competitor/heuristic research already marked unfinished in the README |
-| Architecture | Explain which components use ordinary software, rules, or models |
-| Evaluation | Choose metrics, representative cases, and acceptable performance |
-| Operations | Set latency/cost limits, retention, deployment, monitoring, and support expectations |
-
-## 11. Where this belongs in the README
-
-Keep this fuller product document in `docs/product-plan.md` and link it from the README. The README can summarize the main product choices.
-
-| Existing README section | Material available now | What remains |
-| --- | --- | --- |
-| 0. Project Summary | Chatbot, habit-oriented approach, meal/bodyweight input, intended outcomes | Final first-release scope and primary validation metric |
-| 1. Business / User Problem | Habit modification, user effort, situational/social constraints | Evidence and first target group |
-| 1. Goal | Weight, habit, cost, time, satisfaction, exercise, maintenance goals | Definitions, measurements, and timelines |
-| 1. Stakeholders | Solo founder and possible later professional contributors | Ownership and professional review plan |
-| 1. Prior Work | Research is underway | Actual findings, sources, comparison |
-| 1. Input and Output | Sections 3–8 above | Final field definitions, output contracts, storage choices |
-| 1. Constraints | ComRisk, voice privacy, incomplete data, clinical/privacy considerations | Concrete latency, cost, quality, and operational targets |
-| 1. Success Metrics | Candidate outcomes and communication risks | Explicit measures, thresholds, collection methods |
-| 2. Prompt Architecture | Interpretation, clarification, assumption control, habit analysis, recommendations | Whether responsibilities share a prompt or use separate steps |
-| 2. Evaluation Framework | Main flows and open decisions provide test scenarios | Actual cases, expected behaviour, repeatable evaluation |
-| 3. Model Selection | Desired capabilities are now clearer | Evidence from model comparisons |
-| 4. RAG | No requirement established yet | Revisit if retrieval of a knowledge corpus is needed |
-| 5. Agent Systems | Possible responsibilities and data interactions | Establish whether model-directed tool use is needed |
-| 6. User Interface | Mobile-first voice/chat, weight screen, batch entry, maintenance | Screen definitions and error/correction interactions |
-| 6. API / Infrastructure | No technology choice established by this concept | Implementation and deployment choices |
-| 7. Monitoring | ComRisk, logging effort, estimates, habit/recommendation outcomes | What to measure without unnecessarily copying sensitive conversations |
-| 8. Fine-Tuning | No need demonstrated | Revisit after evidence from a working baseline |
-| 9. Repository Structure | Add this product document under `docs/` | Structure actual code as it is implemented |
-| 10. Timeline & Milestones | Scope, first logging flow, evaluation, weekly analysis, pilot | Deliverables and dates |
-| 11. Appendix | Product plan, open decisions, later research and decision log | Link completed artifacts |
-
-### Suggested next writing order
-
-1. **Section 1: Input and Output.** Define a meal entry, a bodyweight entry, and the outputs the user can receive.
-2. **Section 6: User Interface.** Document single-meal entry, day summary, clarification, correction, and strict no-assumptions behaviour.
-3. **Section 1: Goals, Success Metrics, and Constraints.** Specify how usefulness and communication burden will be judged.
-4. **Section 2: Evaluation Framework.** Turn the flows into representative examples with expected behaviour.
-5. **Section 10: Timeline & Milestones.** Set the first few demonstrable deliverables.
-6. **Section 2: Prompt Architecture.** Draft the workflow after behaviour is sufficiently clear.
-
-Model selection, RAG, agents, and fine-tuning should describe actual needs and experiments rather than require decisions simply because the template contains those sections.
-
-## 12. Greece/EU launch considerations
-
-**Scope:** General planning information checked against official sources on 7 October 2026. This is not a legal opinion approving the particular product. Obtain a Greek lawyer's review of the actual functionality, claims, data flows, and subscription design before public release.
-
-### 12.1 Medical purpose and claims
-
-Software's intended medical purpose affects medical-device qualification. Public descriptions and promotional statements help establish that purpose. Applying this to your app: claims about treating an eating disorder or another condition need a separate classification assessment; a disclaimer alone does not settle the issue.
-
-For an initial release, consider an accurately described habit-logging/general-wellness purpose, with matching behaviour. Do not present the longer-term clinical aspiration as a supported treatment.
-
-Source: [European Commission, MDCG software qualification guidance](https://health.ec.europa.eu/document/download/b45335c5-1679-4c71-a91c-fc7a4d37f12b_en?filename=mdcg_2019_11_en.pdf).
-
-### 12.2 Professional representation
-
-Practising as a dietitian–nutritionist in Greece is subject to professional requirements. Do not represent yourself or the chatbot as a licensed professional without the relevant basis. Ask counsel whether the proposed personalized services engage regulated professional activities.
-
-Source: [Greek National Registry, dietitian–nutritionist professional procedure](https://mitos.gov.gr/index.php/%CE%94%CE%94:%CE%91%CE%BD%CE%B1%CE%B3%CE%B3%CE%B5%CE%BB%CE%AF%CE%B1_%CE%86%CF%83%CE%BA%CE%B7%CF%83%CE%B7%CF%82_%CE%95%CF%80%CE%B1%CE%B3%CE%B3%CE%AD%CE%BB%CE%BC%CE%B1%CF%84%CE%BF%CF%82_%CE%94%CE%B9%CE%B1%CE%B9%CF%84%CE%BF%CE%BB%CF%8C%CE%B3%CE%BF%CF%85_-_%CE%94%CE%B9%CE%B1%CF%84%CF%81%CE%BF%CF%86%CE%BF%CE%BB%CF%8C%CE%B3%CE%BF%CF%85).
-
-### 12.3 Sensitive information and GDPR
-
-The planned profile may reveal health information, particularly when combined with symptoms, emotional eating, or eating-disorder information. Assess it conservatively as potentially sensitive.
-
-Identify both an Article 6 basis and an Article 9 condition where health data is processed. Explicit consent is one possible Article 9 route, not a blanket replacement for all obligations. Keep advertising/training purposes separate from essential service processing.
-
-Source: [EDPB, processing personal data lawfully](https://www.edpb.europa.eu/sme/be-compliant/process-personal-data-lawfully_en).
-
-### 12.4 Privacy design and vendors
-
-Plan minimum collection, access controls, retention, user rights, and a risk assessment; determine whether a DPIA is required. Before a real-user pilot, inspect speech/LLM/hosting vendors' roles, contracts, retention and training practices, and transfer arrangements. Decide whether raw audio/photos are needed after processing.
-
-These are launch-design actions, not an instruction to store full conversations everywhere for debugging.
-
-Sources: [EDPB, compliance by design](https://www.edpb.europa.eu/sme/be-compliant/be-compliant_en); [EDPB, practical FAQ](https://www.edpb.europa.eu/sme/find-practical-info/faq_en).
-
-### 12.5 AI transparency
-
-EU chatbot transparency obligations apply from August 2026. Clearly tell users they are interacting with AI. Assess your role and applicable duties as the app's developer; using a third-party model does not automatically answer that question.
-
-Source: [European Commission, AI Act](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
-
-### 12.6 Trial, subscription, and consumer rights
-
-Disclose trial duration, later price, billing frequency, automatic conversion/renewal, and cancellation clearly. EU distance-service contracts generally carry a 14-day withdrawal right, subject to relevant exceptions. Have counsel check the correct treatment of your ongoing digital service; do not assume that using it once removes the right.
-
-Sources: [Your Europe, pricing and payments](https://europa.eu/youreurope/citizens/consumers/shopping/pricing-payments/index_en.htm); [Your Europe, distance selling](https://europa.eu/youreurope/business/selling-in-eu/selling-goods-services/ecommerce-distance-selling/index_en.htm).
-
-### 12.7 Marketing and affiliate revenue
-
-Avoid unsupported outcome promises or therapeutic claims. Disclose affiliate/sponsored recommendations clearly. Whether an option is recommended for nutritional reasons or because it pays a commission should not be concealed from users.
-
-Sources: [Your Europe, unfair commercial practices](https://europa.eu/youreurope/citizens/consumers/unfair-treatment/unfair-commercial-practices/index_en.htm); [European Commission, commercial disclosure guidance](https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/influencer-legal-hub_en).
-
-### 12.8 Product decisions to make before release
-
-- Decide whether the initial audience is adults only; expanding to minors requires additional legal and product review.
-- Define supported and unsupported use cases with qualified clinical input.
-- Review food, photo, recipe, and dataset licenses before incorporating outside content.
-- Arrange business registration, invoicing, and applicable VAT with a Greek accountant before charging.
-- Provide a basic contact/reporting route from launch; the fuller ticket product can come later.
-
-These are implementation and review recommendations. Specific obligations depend on the actual release and markets.
-
-## 13. Next review
-
-First confirm whether this organization represents the intended product and resolve any incorrect interpretation. Then conduct the requested nutritional and behavioural critique, including:
-
-- The habit-loop model and how trigger/reward evidence is established.
-- Portion categories and snack assumptions.
-- Hunger, fasting, emotional coping, and gamification.
-- Nutrient rationales and estimation uncertainty.
-- Brain-fog claims.
-- Diet labels and recommendation strategies.
-- Goal-setting, maintenance, and clinical boundaries.
-
-No clinical validation or outcome guarantee is implied by organizing these topics.
-
+- Why AI engineering, instead of plain software, rules or classical ML? (README)
+- Prior work: how do other apps do it? (README, p1)
+- Gamification in general (p8). Usefulness is defined; the rest isn't.
+- How a habit's push toward over- or undereating is judged ([§4.3](#43-usefulness)).
+- The Improve Eating Habits path ([§5.3](#53-improve-eating-habits-path)).
+- Photo logging trade-offs (p10).
+- Maintenance: when it starts and how it behaves ([§2.5](#25-user-phases)).
+- Global meal DB: structure and meal families (p7).
+- Diet rules: references, the protein "(?)", the carb reading (p27).
+- Brain fog: an outcome (p1) and a meal danger (p2), not yet a feature.
