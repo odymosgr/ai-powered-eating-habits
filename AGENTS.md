@@ -36,6 +36,7 @@
   - Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
   - Scope (optional): the area changed, one lowercase word (e.g. `council`, `billing`). Omit if cross-cutting
   - `!` (optional): marks a breaking change
+- The message is that one line only: no body, no trailers (no `Co-Authored-By`)
 
 ## Council and My Learning
 
