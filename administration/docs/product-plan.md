@@ -1,7 +1,7 @@
 # AI-Powered Eating Habits — Product Plan
 
-**Version 2, 21 Oct 2026.** Rewritten from the [paper notes](initial-notes/initial-notes.md) (6–15 Oct) and the 7 Oct plan. Where the notes changed their mind, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
-Council proposals, research gaps and open decisions are in [product-plan-review.md](product-plan-review.md). None of them are applied here.
+**Version 3, 26 Oct 2026.** Rewritten from the [paper notes](initial-notes/initial-notes.md) (6–15 Oct) and the 7 Oct plan; v3 adds the accepted council proposals and Odysseas's ideas from 23–26 Oct. Where ideas changed, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
+Proposals still open are in [product-plan-review.md](product-plan-review.md).
 
 ## Contents
 
@@ -13,13 +13,15 @@ Council proposals, research gaps and open decisions are in [product-plan-review.
 6. [The AI dietitian](#6-the-ai-dietitian)
 7. [Food supply](#7-food-supply)
 8. [Screens](#8-screens)
-9. [Scope](#9-scope)
-10. [Open questions](#10-open-questions)
+9. [Technical foundations](#9-technical-foundations)
+10. [Scope](#10-scope)
+11. [Open questions](#11-open-questions)
 
 ## 1. Vision
 
 - **Why this project:** practice AI software engineering on a real product. A generic habit-visualization tool would be a logical pivot, but this app is the vehicle (p26).
 - **Problem:** most people want to lose fat, build muscle or eat healthier. Strict diets and calorie-exact logging are high friction; the lowest-friction path is to change the habits they already have.
+- **Target users:** people who want results. People who like keeping food photos aren't excluded, just not targeted first.
 - **Selling point:** a clear view of your own eating habits, the easiest way to make someone change them (p26). Persuading through an AI is the harder, second layer ([§6](#6-the-ai-dietitian)).
 - **How it works:** users log their morning bodyweight and what they ate ([§3](#3-logging)). The app's AI turns each week of logs into habits scored against the user's goals ([§2](#2-the-habit-model), [§4](#4-goals-and-progress)). A weekly session with the AI dietitian turns that view into small changes toward healthier, cheaper alternatives ([§6](#6-the-ai-dietitian)).
 - **Outcomes for users:** reach their goal bodyweight; overcome a bad habit; food that costs less money and time, with less hunger, more energy and less brain fog; habits that fuel their exercise and recovery. Longshot: help overcome an eating disorder.
@@ -72,7 +74,9 @@ Comparing week X with week X+1, a habit is:
 - **Eliminated:** its trendline stops.
 - **Emerged:** a new trendline starts.
 
-Trends are goal-dependent and need several weeks. Weeks analysed under older goals stay visible but marked as goal-mismatched (gray or shadow overlay), with goal-change moments shown and older goals viewable on click. Maybe also re-view trends through an older goal's lens (costly compute and storage).
+A habit's identity is its trigger: habits keep stable IDs keyed by trigger, and each weekly analysis maps its groups onto existing habits before creating new ones. Without this there are no trends.
+
+Trends are goal-dependent and need several weeks. Weeks analysed under older goals stay visible but marked as goal-mismatched (gray or shadow overlay), with goal-change moments shown and older goals viewable on click. Maybe also re-view trends through an older goal's lens; that's cheap, since scoring is code ([§9.1](#91-the-ai-extracts-code-scores)).
 
 ### 2.5 User phases
 
@@ -97,17 +101,17 @@ _Notes: p0, p4–5, p7, p9–10, p12, p18, p28._
 ### 3.2 Meals
 
 - **Input:**
-  - Voice: more description gives the AI more to work with, but costs effort and can be awkward in front of people. Once the AI understands the user's habits, offer no-voice options.
-  - Text, through the input field or chat.
-  - Photo: better UX, but little context, plus storage and processing cost (open, [§10](#10-open-questions)).
-  - Common meals: quick logging from a page inside the meal logger, updated weekly, with history.
-- **When:** ideally right after eating, so the log time is enough. Or roughly, for a whole day, at its end.
+  - **Onboarding week: voice.** It gathers the most useful information, worth the extra friction, though speaking can be awkward in front of people.
+  - **After onboarding:** logging leans on easy photos, common meals (old habits) and the dietitian sessions. Photos are processed into the user's common meals, then dropped ([§9.2](#92-data-rules)).
+  - **Text**, through the input field or chat, works anytime.
+  - **Common meals:** quick logging from a page inside the meal logger, updated weekly, with history.
+- **When:** per meal, ideally right after eating so the log time is enough, or the whole day at its end. Users pick the mode in onboarding ([§3.5](#35-reminders)).
 - **Clarifications:** the AI may ask for more information, or propose assumptions the user can delete. Both carry **communication risk (ComRisk)**: the chance that the AI's questions or assumptions burden users enough to disengage. Users can switch them off, or give the AI direct orders.
 
 ### 3.3 Days
 
-- A day runs 04:00–04:00 in the user's timezone, defined by sleep. For unstable sleepers, contextual anchors ("when I wake up", "before work", "at lunchtime") keep the app useful. Onboarding asks about sleep stability (and stomach).
-- Parts of the day: morning · lunchtime · afternoon · night · midnight.
+- A day runs 04:00–04:00 in the user's timezone. 04:00 is the middle of a typical night (sleep around midnight to 08:00): a practical default, easy to change later because days are derived from stored times ([§9.2](#92-data-rules)). For unstable sleepers, contextual anchors ("when I wake up", "before work", "at lunchtime") keep the app useful. Onboarding asks about sleep stability (and stomach).
+- **Parts of the day:** a predefined set of labels at first (morning · lunchtime · afternoon · night · midnight), maybe user-defined later. A label implies a rough time, so users can tag meals without being specific, which suits end-of-day logging. An exact time, when given, is a better data point.
 - The **day page** shows the day's events in strict order. Users can reorder them; leaving without saving asks for confirmation.
 
 ### 3.4 Meal event
@@ -119,15 +123,25 @@ One eating occasion, made of one or more **items** (parts better logged separate
 | Time | Part of the day, plus the log timestamp |
 | Name | User-given. May inform a future global meal DB |
 | Size | Snack: small plate or handful < Normal: large plate < Large: heavy large plate, or large with a side < XL: until the stomach can't take more |
+| Volume | Physical volume: how much the meal fills the stomach. The primary underlying metric for satiety: high satiety = high volume + low calories. Words like "filling" or "light" are combinations or wordings of the two |
 | Nutrition | Calories, protein, fat, carbs. AI estimates, good enough for guidance |
-| Context | Place, company, emotion, way of eating (rushed, slow, mindful), each with a confidence: stated by the user ⟷ inferred from habit trends or otherwise |
+| Context | Place, company, emotion, way of eating (rushed, slow, mindful), each with a confidence: stated by the user ⟷ inferred, and how ([§9.2](#92-data-rules)) |
 | Supply | Where the food came from, and whether the user controls it or others are involved |
 | Price, prep time | Rough estimates, only if relevant to the user. Prep time excludes shopping |
 | Goal value | Diet adherence under the goals at that time ([§4.3](#43-usefulness)) |
 
 Each snacking occasion is its own event, so stacked snacks stay visible. A snack multiplier (1 · 2 · 3 · too many) counts portions within one.
 
-### 3.5 Data at a glance
+### 3.5 Reminders
+
+Only reminders the user agreed to. Onboarding sets them up together with the logging mode:
+
+- **Per meal:** a couple of reminders during the day, timed from the user's habits once known (e.g. 30 minutes after their usual lunch). E.g. "I see you haven't logged any meals yet, and it's afternoon. Haven't you eaten at all?" with the answers *Not yet* and *Log them now*.
+- **End of day:** one evening reminder.
+
+A **day complete** mark tells the analysis which days are fully logged, so missing meals aren't read as undereating.
+
+### 3.6 Data at a glance
 
 ```mermaid
 erDiagram
@@ -158,7 +172,7 @@ Goals have a strict priority order agreed with the user: by default 1 > 2 > 3, r
 2. **Diet adherence:** follow a diet ([§4.4](#44-diet-rules)). MVP: low carb (for fat loss) and high protein (for muscle growth).
 3. **Custom goal** (later): one free-text goal, e.g. a user-defined diet or meal cost. The AI judges meals and habits against a baseline, the first week's logs. It must state a single goal and must not be a security risk.
 
-- Goals change at most once a week, and only the last week's goal values are recalculated: recalculating older weeks is costly, and scarcity builds commitment.
+- Goals change at most once a week: scarcity builds commitment. A change applies from the current week; older weeks keep the goals they were scored under ([§9.2](#92-data-rules)).
 - The bodyweight direction gets the wording the user prefers, picked from a predefined table, stored with the user and used by the AI whenever it talks to them. It changes with the goal.
 
   | Direction | Wording options |
@@ -171,7 +185,8 @@ Goals have a strict priority order agreed with the user: by default 1 > 2 > 3, r
 
 ### 4.2 Measuring progress
 
-- **Hard** measurement: bodyweight. **Soft** measurement: calorie intake from the logs. Together they give a good idea of daily expenditure.
+- Bodyweight is the **hard** evidence and logged calories are **soft**. We work out expenditure from both, so any counting bias ends up inside it. If someone logs less than they eat and their weight stays flat, we conclude they're in balance at the logged number. Expenditure is the free variable that counterbalances the calorie-logging bias. If the bias changes over time, we have to wait for the bodyweight trend to make it visible.
+- So stable calorie estimates beat accurate ones ([§9.3](#93-ai-engineering-habits)). In ratios like d.d.p. and overlap, a constant bias cancels entirely.
 - During the onboarding week bodyweight is assumed stable (users are asked not to change habits, partly for this), so average logged intake ≈ expenditure. The week also gives the average number of meals per day.
 - Bodyweight goal + this baseline → a **daily calorie goal**. There is no per-meal calorie goal.
 
@@ -191,7 +206,7 @@ Custom goals are the big unknown. Diet-like ones are easy; cost-like ones need r
 
 Every rule needs study references before use ([§6.4](#64-library)). Metric units first.
 
-- **Why macros matter:** protein and fat give satiety; fat must stay above zero for hormonal health; carbs give daily energy and training fuel, and may help anabolism (insulin, full glycogen stores); calories drive bodyweight.
+- **Why macros matter:** protein and fat give high sustenance; fat must stay above zero for hormonal health; carbs give daily energy and training fuel, and may help anabolism (insulin, full glycogen stores); calories drive bodyweight. Satiety itself: [§3.4](#34-meal-event).
 - **High protein ("hp"):** building muscle needs training, and quality training needs energy, so: high protein with enough carbs.
 
   | hp diet | Amount |
@@ -213,11 +228,11 @@ flowchart TD
     P --> S["Basic stats"]
     S --> A["Enter the app: only the onboarding session is open"]
     A --> O["Onboarding session with the AI dietitian"]
-    O --> W["Onboarding week of logging"]
+    O --> W["Onboarding week: voice logging"]
     W --> F["First weekly session unlocks"]
 ```
 
-- **Asked along the way:** is a scale within reach on waking (asked first); sleep stability (and stomach); food supply habits and who else shapes them; deeper goals, e.g. lose fat → an upcoming wedding, build muscle → be more attractive or unlock athletic potential.
+- **Asked along the way:** is a scale within reach on waking (asked first); sleep stability (and stomach); food supply habits and who else shapes them; deeper goals, e.g. lose fat → an upcoming wedding, build muscle → be more attractive or unlock athletic potential; the logging mode and its reminders ([§3.5](#35-reminders)).
 - **Basic stats:** age; gender (male, female, other / prefer not to say); height; bodyweight, a rough estimate if no scale is at hand. Gathered at the end for better UX (p15), though the Build Muscle sketch asks first (p17).
 - **Onboarding session:** clarify goals; define current problems (a sales step); set expectations (initial logging, a preview of what follows); commit to next steps (daily bodyweight and meal logging).
 
@@ -345,35 +360,79 @@ flowchart LR
     H -.-> G["Goals page"]
 ```
 
-## 9. Scope
+## 9. Technical foundations
 
-### 9.1 MVP
+_Accepted from the council review on 23 Oct._
 
-Everything in sections 1–8, except what 9.2 lists.
+### 9.1 The AI extracts, code scores
 
-### 9.2 Later
+| Job | Done by |
+| --- | --- |
+| Turn a log (text, voice transcript, photo) into meal events and items with nutrition estimates | LLM |
+| Group a week's events into 3–5 habits and match them to existing ones ([§2.4](#24-habit-trends)) | LLM |
+| Comment on logs; run onboarding and weekly sessions | LLM |
+| Days, parts of day, units, unlocks, reminders | Code |
+| Expenditure, calorie goal, bodyweight trend | Code |
+| Diet-adherence rules, usefulness, d.d.p., overlap, trends | Code |
+
+Extraction doesn't depend on goals; scoring does. So changing goals, or viewing old weeks through another goal, re-runs arithmetic, not the LLM. The custom goal is the exception: judging free text needs the LLM. Scores stay explainable and unit-testable.
+
+### 9.2 Data rules
+
+| Topic | Rule | Why |
+| --- | --- | --- |
+| Raw input | Keep the user's original words (text or transcript). Don't keep raw audio or photos after processing | Re-parse old logs with better prompts or models; privacy; storage |
+| AI outputs | Tag each with its prompt and model version | Know what to recompute; compare versions |
+| Time | Store when eaten as a UTC instant + IANA timezone, flagged as approximate when it comes from a part-of-day label; store when logged separately. Derive the day and part of day | End-of-day logging, travel, daylight saving |
+| Goals | Version them with start dates; never overwrite | Goal-mismatched overlays and lenses need the history |
+| Units | Store kg, g, kcal; convert at display | Imperial later costs nothing |
+| Confidence | Keep stated, inferred, confirmed and rejected values apart, plus the method behind each inference (e.g. AI parse, habit trend, photo) | Trust, corrections, deleting assumptions |
+
+### 9.3 AI engineering habits
+
+- Structured outputs (JSON schema) for parsing and habit analysis, validated before saving.
+- Prompts in versioned files.
+- An evaluation set from Odysseas's own logs: expected items, size and part of day, and a hand-made habit grouping. Also stability: the same week analysed twice gives the same habits.
+- **Stable calorie estimates** ([§4.2](#42-measuring-progress)): repeat meals reuse their common-meal values instead of being re-estimated; after a model or prompt change, history is re-estimated (outputs are versioned, [§9.2](#92-data-rules)). Test estimate stability before accuracy.
+- The custom goal (later) is user text inside a prompt: treat it as data, never instructions (prompt injection).
+- The library ([§6.4](#64-library)) is the AI's only source of health claims. It's small enough to sit in the prompt; no vector search at first.
+
+## 10. Scope
+
+### 10.1 MVP slices
+
+The core comes first. The slices test the two riskiest assumptions: that people log daily, and that the AI turns rough logs into habits that reveal something new.
+
+```mermaid
+flowchart LR
+    S1["MVP-slice-1<br/>Log meals and bodyweight<br/>Day page"] --> S2["MVP-slice-2<br/>Weekly habit view"] --> S3["MVP-slice-3<br/>Goals, onboarding,<br/>per-log comments"] --> S4["MVP-slice-4<br/>Weekly session,<br/>commitments, supply"]
+```
+
+- **MVP-slice-1:** single user; no accounts, no payments. Voice through the phone keyboard's dictation. Odysseas tests it personally for 2 weeks; done when at least 12 of 14 days are logged.
+- **MVP-slice-2:** habits, common meals, d.d.p., overlap and trends; usefulness comes with goals in slice 3. Done when, run on the slice-1 logs, it shows Odysseas something new.
+- **Later MVP slices:** the rest of sections 1–8, except [§10.2](#102-later), ordered when we get there.
+
+### 10.2 Later
 
 | Area | Items |
 | --- | --- |
-| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; a global meal DB |
+| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; a global meal DB; photo history, much later, for users who like keeping food photos |
 | Goals | Custom goal; keto; per-meal bodyweight usefulness; a workout-rules section on the goals page; imperial units |
 | AI dietitian | A user-chosen character; a short per-user md file defining how the AI speaks; a recipe book |
-| Screens | Exercise page (works like the supply page) and exercise advice; menstrual-cycle tracking and advice; hydration entry point; a brief app overview after onboarding |
+| Screens | Exercise page (works like the supply page) and exercise advice; menstrual-cycle tracking and advice; hydration entry point; a brief app overview after onboarding; a phone home-screen widget for one-tap logging of the user's top common meal, shown with its SVG picture |
 | Support | Complaint service: chat-like, with requests |
 
-### 9.3 Parked until a prototype exists
+### 10.3 Parked until a prototype exists
 
 - **Monetization:** a 1-month free trial with visible results by its end; paying to unlock analysis after the onboarding week, with a discounted first payment (or a cheaper first 6–12 months); goals locked during the trial unless buying; affiliate income (yogurt, food places).
 - **Legal:** advice involving other people; health claims; the 7 Oct plan's Greece/EU checklist (§12 of `git show 83026e4:administration/docs/product-plan.md`).
 
-## 10. Open questions
+## 11. Open questions
 
-- Why AI engineering, instead of plain software, rules or classical ML? (README)
 - Prior work: how do other apps do it? (README, p1)
 - Gamification in general (p8). Usefulness is defined; the rest isn't.
 - How a habit's push toward over- or undereating is judged ([§4.3](#43-usefulness)).
 - The Improve Eating Habits path ([§5.3](#53-improve-eating-habits-path)).
-- Photo logging trade-offs (p10).
 - Maintenance: when it starts and how it behaves ([§2.5](#25-user-phases)).
 - Global meal DB: structure and meal families (p7).
 - Diet rules: references, the protein "(?)", the carb reading (p27).
