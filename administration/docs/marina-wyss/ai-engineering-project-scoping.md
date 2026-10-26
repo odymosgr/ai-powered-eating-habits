@@ -21,7 +21,8 @@ The user just logs their morning bodyweight and what they ate just their voice, 
 Then the app has enough information to track their habits and suggest healthier and cheaper alternatives.<br>
 (+) After the MVP liquid intake and hydration will also be taken into account.
 
-(+) Why is AI engineering the right approach (vs. traditional software, rule-based systems, or classical ML)?
+**Why is AI engineering the right approach (vs. traditional software, rule-based systems, or classical ML)?**
+Users describe meals in their own words, by voice or photo, and habits only appear when a week of rough, incomplete logs is grouped by meaning. That takes language understanding and judgment: rules can't parse free-form meals, and classical ML would need a labelled dataset that doesn't exist. Everything with clear rules stays plain code; the split is in [product plan §9.1](../product-plan.md#91-the-ai-extracts-code-scores).
 
 ## Goal
 
