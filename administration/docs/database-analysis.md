@@ -36,8 +36,9 @@ Both designs are the best version of each after the review (what changed: [§4.3
 ```mermaid
 erDiagram
     USERS ||--o{ DEVICES : "push tokens"
-    USERS ||--o{ RAW_LOGS : writes
-    RAW_LOGS ||--o{ MEAL_EVENTS : "parsed into"
+    USERS ||--o{ LOG_THREADS : starts
+    LOG_THREADS ||--|{ LOG_MESSAGES : holds
+    LOG_THREADS ||--o{ MEAL_EVENTS : "parsed into"
     MEAL_EVENTS ||--|{ ITEMS : contains
     MEAL_EVENTS ||--o{ CONTEXT_FACTS : has
     USERS ||--o{ BODYWEIGHTS : logs
@@ -54,10 +55,14 @@ erDiagram
     SESSIONS ||--o{ COMMITMENTS : produces
     HABITS ||--o{ COMMITMENTS : targets
     USERS ||--o{ AI_CALLS : triggers
-    RAW_LOGS {
+    LOG_THREADS {
         uuid id
-        text original_words
         text parse_status
+        jsonb draft
+    }
+    LOG_MESSAGES {
+        text role
+        text content
     }
     MEAL_EVENTS {
         timestamptz eaten_at
@@ -74,7 +79,7 @@ erDiagram
 - **Constraints check every write, the server's included:** types, one weight per user and day, foreign keys, an exclusion constraint against overlapping goal versions, and JSON-schema checks (`pg_jsonschema`) on the `jsonb` columns that hold LLM output.
 - **Row-level security (RLS) on every table:** an event trigger switches it on for new tables, and views run with `security_invoker`.
 - **Multi-table writes** go through one RPC function (plpgsql) per kind of write, each a single transaction: supabase-js can't span several tables in one.
-- **Parse pipeline:** each raw log has a parse status. The parse function replies at once and works in the background; a cron sweeper or Supabase Queues retries logs left pending.
+- **Parse pipeline:** each log thread ([plan §3.2](product-plan.md#the-log-thread)) has a parse status, and its draft lives as JSON until Done turns it into rows. The parse function replies at once and works in the background; a cron sweeper or Supabase Queues retries threads left pending.
 - **Parse versions side by side** with an active flag: comparing prompts or models on real history is a query, and rolling back is an update.
 - **Schema in the repo** as SQL migrations, with TypeScript types generated from them; a local stack, pgTAP tests and advisors run from the CLI.
 
@@ -83,8 +88,8 @@ erDiagram
 | Path | Holds |
 | --- | --- |
 | `users/{uid}` | Profile, settings, logging mode, boundaries, push tokens, next reminder time |
-| `users/{uid}/rawLogs/{id}` | Original words, input type, logged at, parse status and version. The phone makes the ID, so a retry can't duplicate it |
-| `users/{uid}/mealEvents/{rawLogId}_{n}` | Eaten at + timezone, approximate flag, part of day, size, parse version; items and context embedded |
+| `users/{uid}/logThreads/{id}` and `.../messages/{id}` | The thread's messages (original words, questions, answers), parse status and version, the draft. The phone makes the ID, so a retry can't duplicate it |
+| `users/{uid}/mealEvents/{threadId}_{n}` | Eaten at + timezone, approximate flag, part of day, size, parse version; items and context embedded |
 | `users/{uid}/bodyweights/{yyyy-mm-dd}` | Weight, edited at. One per day by ID |
 | `users/{uid}/dayMarks/{yyyy-mm-dd}` | Day-complete mark |
 | `users/{uid}/goalVersions/{weekStart}`, `.../calorieGoals/{weekStart}` | One version per week by ID, create-only |
@@ -96,7 +101,7 @@ erDiagram
 | `users/{uid}/aiCalls/{id}` | Every LLM call, for evals |
 
 - **No copied aggregates:** at our scale a year of weights is about 365 reads (the free quota is 50,000 a day), so the shared code computes totals and averages on read. A day is a range query on `eatenAt`. At planetary scale, per-read pricing brings copies back ([§7](#7-at-planetary-scale)).
-- **Deterministic IDs** enforce rules: the phone makes raw-log IDs, events are `{rawLogId}_{n}`, versions are keyed by week start, weights by day.
+- **Deterministic IDs** enforce rules: the phone makes thread IDs, events are `{threadId}_{n}`, versions are keyed by week start, weights by day.
 - **Links are stored once,** in the weekly analysis document.
 - **A zod data layer** (`withConverter`) defines every shape: server writes skip security rules, and nothing else checks them.
 - **The native SDK** (React Native Firebase, in an Expo dev build) shows writes at once and queues them on bad signal.
@@ -122,7 +127,7 @@ sequenceDiagram
 
 | # | Function | Relational | Document |
 | --- | --- | --- | --- |
-| F1 | Log a meal, parsed in the background ([plan §3.2](product-plan.md#32-meals)) | The app inserts a `raw_logs` row with a phone-made ID; a small outbox retries on bad signal. A webhook starts the parse function, which replies at once, calls the LLM and writes events and items through one RPC transaction. A sweeper retries logs still pending; Realtime updates the screen | The app writes a `rawLogs` doc; the native SDK shows it at once and queues it on bad signal. A function fires on create (retries on, idempotent by ID), calls the LLM and writes events with deterministic IDs. A listener updates the screen |
+| F1 | Log a meal through its thread ([plan §3.2](product-plan.md#the-log-thread)) | The app inserts a `log_threads` row and its first message with phone-made IDs; a small outbox retries on bad signal. A webhook starts the parse function, which replies at once, calls the LLM and writes events and items through one RPC transaction. A sweeper retries logs still pending; Realtime updates the screen | The app writes a `logThreads` doc and its first message; the native SDK shows them at once and queues it on bad signal. A function fires on create (retries on, idempotent by ID), calls the LLM and writes events with deterministic IDs. A listener updates the screen |
 | F2 | Day page ([§3.3](product-plan.md#33-days)) | One query by `eaten_at` range (the shared code turns the logical day into a UTC range), items nested in the same select | One range query on `eatenAt`; items come embedded |
 | F3 | Log or edit bodyweight: one a day, editable until the next day, huge jumps refused ([§3.1](product-plan.md#31-bodyweight)) | A unique (user, day) constraint; a function checks the jump and the edit window | The doc ID gives one per day; a function checks the jump and the window (rules can't compute local days) |
 | F4 | Weight Room: week bars, completeness, full calendar ([§8.3](product-plan.md#83-weight-room)) | Read the weights for the range (about 365 rows a year); the shared code builds weeks, averages, completeness and trends | Read the range (about 365 docs a year); the same shared code |
@@ -133,7 +138,7 @@ sequenceDiagram
 | F9 | Reminders ([§3.5](product-plan.md#35-reminders)) | `pg_cron` every few minutes finds users whose stored next reminder time is due and who haven't logged today, sends push through Expo's service and stores the next time | A scheduled function does the same; push through FCM or Expo |
 | F10 | Sessions and commitments ([§6.2](product-plan.md#62-weekly-session)) | `messages` rows per session; commitments reference the habit; adherence is a query on next week's memberships | A `messages` subcollection; commitments store the habit ID; adherence reads next week's `analyses` doc |
 | F11 | One-tap common meal ([§9.3](product-plan.md#93-ai-engineering-habits)) | Copy the common meal's items into a new event; nothing re-estimated | The same, embedding the template's items |
-| F12 | Re-estimate history after a model or prompt change ([§9.2](product-plan.md#92-data-rules)) | A local script re-parses old-version raw logs, inserts the new events side by side and switches the active flag; F5 re-runs for the affected weeks. Stale links fail loudly | A local script re-parses and rewrites events; F5 re-runs. Old analyses keep stale `eventIds` silently unless checked |
+| F12 | Re-estimate history after a model or prompt change ([§9.2](product-plan.md#92-data-rules)) | A local script re-parses old-version threads, inserts the new events side by side and switches the active flag; F5 re-runs for the affected weeks. Stale links fail loudly | A local script re-parses and rewrites events; F5 re-runs. Old analyses keep stale `eventIds` silently unless checked |
 | F13 | Change a representation rule, e.g. the 04:00 boundary ([§3.3](product-plan.md#33-days)) | Change the shared code; only date-keyed rows (weights, day marks) may need a small backfill | The same |
 | F14 | Evals and the AI call log | Eval sets are SQL joins of original words, parse output and corrections | `aiCalls` exported by a script |
 | F15 | Delete an account (an App Store requirement) | Delete the user: everything cascades if every foreign key says `on delete cascade`; stored files go first | One `recursiveDelete` of `users/{uid}`; stored files separately |
@@ -235,7 +240,7 @@ Firebase's advantages are real but small to rebuild: an outbox for bad signal, a
 2. Clients write only raw inputs; AI outputs go through server functions.
 3. RLS on by default (event trigger), `security_invoker` views, Security Advisor in CI, and tests that a second user sees nothing and anonymous calls fail.
 4. One RPC function per multi-table write.
-5. A parse status on every raw log, a parse function that replies at once, and a sweeper or queue for retries.
+5. A parse status on every log thread, a parse function that replies at once, and a sweeper or queue for retries.
 6. Phone-made IDs and a small outbox, so a log sent on bad signal is retried, never lost or duplicated.
 7. Parse versions side by side with an active flag; JSON-schema checks on the LLM-output columns.
 8. A nightly database dump; the Pro plan once others rely on the app.

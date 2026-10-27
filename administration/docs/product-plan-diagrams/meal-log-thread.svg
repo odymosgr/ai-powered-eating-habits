@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 440" width="780" height="440" role="img" aria-label="Meal-log thread storyboard: say it, review the guesses, answer optional questions, confirm with add more or done, then see the result">
+<title>Meal-log thread storyboard: say it, review the guesses, answer optional questions, confirm with add more or done, then see the result</title>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1e40af"/>
+  </marker>
+</defs>
+<style>
+  text { font-family: Helvetica, Arial, sans-serif; fill: #1e40af; font-size: 14px; }
+  .s { font-size: 12px; }
+  .xs { font-size: 11px; }
+  .b { font-weight: bold; }
+  .g { fill: #6b7280; }
+  .ln { fill: none; stroke: #1e40af; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .box { fill: none; stroke: #1e40af; stroke-width: 1.4; }
+  .chip { fill: #ffffff; stroke: #1e40af; stroke-width: 1.2; }
+  .dash { fill: #ffffff; stroke: #1e40af; stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .soft { fill: #dbe3f6; stroke: #1e40af; stroke-width: 1.4; }
+</style>
+<rect x="0.5" y="0.5" width="779" height="439" rx="10" fill="#fffef8" stroke="#e5e7eb"/>
+<text x="24" y="26" class="b">Meal-log thread</text>
+<text x="756" y="26" class="s" text-anchor="end">Fastest path: say it, then Done</text>
+
+<text x="90" y="48" class="s b" text-anchor="middle">1 Say it</text>
+<text x="90" y="62" class="xs g" text-anchor="middle">voice or text</text>
+<text x="242" y="48" class="s b" text-anchor="middle">2 Guesses</text>
+<text x="242" y="62" class="xs g" text-anchor="middle">only if new ones</text>
+<text x="394" y="48" class="s b" text-anchor="middle">3 Questions</text>
+<text x="394" y="62" class="xs g" text-anchor="middle">only if needed</text>
+<text x="546" y="48" class="s b" text-anchor="middle">4 Confirm</text>
+<text x="546" y="62" class="xs g" text-anchor="middle">add more or done</text>
+<text x="698" y="48" class="s b" text-anchor="middle">5 Result</text>
+<text x="698" y="62" class="xs g" text-anchor="middle">a rough estimate</text>
+
+<rect x="24" y="68" width="132" height="250" rx="16" class="box"/>
+<text x="36" y="96" class="s">You said</text>
+<rect x="36" y="104" width="108" height="60" rx="8" class="box"/>
+<text x="44" y="122" class="xs">Two eggs and two</text>
+<text x="44" y="137" class="xs">slices of toast</text>
+<text x="44" y="152" class="xs">this morning</text>
+<circle cx="90" cy="262" r="22" class="box"/>
+<rect x="85" y="250" width="10" height="15" rx="5" class="box"/>
+<path d="M81,262 a9,9 0 0 0 18,0 M90,271 L90,276" class="ln"/>
+<text x="90" y="302" class="xs g" text-anchor="middle">or type</text>
+
+<path d="M157,193 L174,193" class="ln" marker-end="url(#arr)"/>
+
+<rect x="176" y="68" width="132" height="250" rx="16" class="box"/>
+<text x="298" y="88" class="xs g" text-anchor="end">Start over</text>
+<text x="188" y="106" class="s">Understood</text>
+<rect x="188" y="114" width="48" height="20" rx="10" class="chip"/>
+<text x="212" y="128" class="xs" text-anchor="middle">2 eggs</text>
+<rect x="242" y="114" width="54" height="20" rx="10" class="chip"/>
+<text x="269" y="128" class="xs" text-anchor="middle">2 toast</text>
+<rect x="188" y="140" width="64" height="20" rx="10" class="dash"/>
+<text x="220" y="154" class="xs" text-anchor="middle">Butter ×</text>
+<rect x="188" y="166" width="74" height="20" rx="10" class="dash"/>
+<text x="225" y="180" class="xs" text-anchor="middle">At home ×</text>
+<rect x="188" y="192" width="58" height="20" rx="10" class="dash"/>
+<text x="217" y="206" class="xs" text-anchor="middle">08:00 ×</text>
+<rect x="186" y="232" width="112" height="30" rx="8" class="soft"/>
+<text x="242" y="251" class="s b" text-anchor="middle">Lock info ✓</text>
+<text x="242" y="290" class="xs g" text-anchor="middle">dashed = a guess</text>
+
+<path d="M309,193 L326,193" class="ln" marker-end="url(#arr)"/>
+
+<rect x="328" y="68" width="132" height="250" rx="16" class="box"/>
+<text x="450" y="88" class="xs g" text-anchor="end">Start over</text>
+<text x="340" y="108" class="s">How were the eggs</text>
+<text x="340" y="123" class="s">cooked?</text>
+<rect x="340" y="136" width="108" height="24" rx="6" class="box"/>
+<text x="394" y="152" class="xs" text-anchor="middle">Boiled</text>
+<rect x="340" y="166" width="108" height="24" rx="6" class="box"/>
+<text x="394" y="182" class="xs" text-anchor="middle">Fried</text>
+<rect x="340" y="196" width="108" height="24" rx="6" class="box"/>
+<text x="394" y="212" class="xs" text-anchor="middle">Poached</text>
+<text x="394" y="244" class="xs" text-anchor="middle" text-decoration="underline">Skip</text>
+<text x="394" y="290" class="xs g" text-anchor="middle">a tap locks the answer</text>
+
+<path d="M461,193 L478,193" class="ln" marker-end="url(#arr)"/>
+
+<rect x="480" y="68" width="132" height="250" rx="16" class="box"/>
+<text x="602" y="88" class="xs g" text-anchor="end">Start over</text>
+<text x="546" y="110" class="s" text-anchor="middle">Everything</text>
+<text x="546" y="125" class="s" text-anchor="middle">important recorded</text>
+<text x="546" y="140" class="s" text-anchor="middle">for the meal?</text>
+<rect x="492" y="164" width="108" height="28" rx="8" class="box"/>
+<text x="546" y="182" class="xs" text-anchor="middle">Add more (voice)</text>
+<rect x="492" y="204" width="108" height="28" rx="8" class="soft"/>
+<text x="546" y="223" class="s b" text-anchor="middle">Done ✓</text>
+<text x="546" y="290" class="xs g" text-anchor="middle">no numbers yet</text>
+
+<path d="M613,193 L630,193" class="ln" marker-end="url(#arr)"/>
+
+<rect x="632" y="68" width="132" height="250" rx="16" class="box"/>
+<text x="644" y="100" class="s b">Logged ✓</text>
+<text x="644" y="126" class="b">≈ 380 kcal</text>
+<text x="644" y="146" class="xs">Protein 20 g</text>
+<text x="644" y="161" class="xs">Carbs 28 g</text>
+<text x="644" y="176" class="xs">Fat 26 g</text>
+<text x="644" y="194" class="xs g">Rough estimate</text>
+<rect x="644" y="206" width="108" height="40" rx="8" class="box"/>
+<text x="652" y="222" class="xs">Good protein to</text>
+<text x="652" y="236" class="xs">start the day!</text>
+<text x="698" y="290" class="xs g" text-anchor="middle">logged and done</text>
+
+<path d="M546,320 L546,388 L242,388 L242,322" class="ln" marker-end="url(#arr)"/>
+<text x="394" y="406" class="s" text-anchor="middle">Add more: the AI re-parses the thread; locked info and answers stay</text>
+<text x="394" y="424" class="xs g" text-anchor="middle">Start over, on any screen: a fresh thread, the old one kept for evals</text>
+</svg>

@@ -105,20 +105,35 @@ _Notes: p0, p4–5, p7, p9–10, p12, p18, p28, p32–33._
 
 - **Input:**
   - **Onboarding week: voice.** It gathers the most useful information, worth the extra friction, though speaking can be awkward in front of people.
-  - **After onboarding:** logging leans on easy photos, common meals (old habits) and the dietitian sessions. Photos are processed into the user's common meals, then dropped ([§9.2](#92-data-rules)).
+  - **After onboarding:** logging leans on easy photos, common meals (old habits) and the dietitian sessions. An image-to-text step turns a photo into a description; only the description is kept ([§9.2](#92-data-rules)).
   - **Text**, through the input field or chat, works anytime.
   - **Common meals:** quick logging from a page inside the meal logger, updated weekly, with history.
   - **Shared meals** need no special feature: users describe them loosely ("a little of this and some of that, at a dinner with friends") and the AI estimates.
 - **When:** per meal, ideally right after eating so the log time is enough, or the whole day at its end. Users pick the mode in onboarding ([§3.5](#35-reminders)).
-- **Speed** is the main UX metric: a repeat meal in about two taps, a new one in one spoken sentence. Logs save instantly and get parsed in the background.
-- **Clarifications:** the AI may ask for more information, or propose assumptions the user can delete. Both carry **communication risk (ComRisk)**: the chance that the AI's questions or assumptions burden users enough to disengage. Users can switch them off, or give the AI direct orders. To consider when building: show a parsed log as removable chips, inferred ones styled differently; deleting a chip rejects that assumption, so no question is needed.
+- **Speed** is the main UX metric: a repeat meal in about two taps, a new one in one spoken sentence plus Done. Logs save instantly and get parsed in the background.
+
+#### The log thread
+
+Each log is a short thread between the user and the AI. Its review steps exist to complete the log without the user having to say more, and each appears only when it has something to show.
+
+![Meal-log thread storyboard: say it, review the guesses, answer optional questions, confirm with add more or done, then see the result](product-plan-diagrams/meal-log-thread.svg)
+
+1. **Say it:** voice or text, later a photo. The words are saved at once.
+2. **Guesses,** only if the AI made new ones: chips show what it understood. What the user said is solid; guesses are dashed, each with an × to drop it. One **Lock info ✓** button keeps the remaining guesses.
+3. **Questions,** only if needed: skippable, with suggested answers as buttons; a tap locks the answer. At most 5 per log.
+4. **"Everything important recorded for the meal?"** **Add more** sends another voice message: the AI re-parses the thread, keeping locked info and answers. The new words complement the earlier ones and win where they contradict. **Done** finalizes the log.
+5. **Result,** only after Done: calories and macros marked as a rough estimate, and the AI dietitian's comment ([§6.1](#61-comment-on-every-log)). Then the log is done. Hiding the numbers until this point keeps users from dropping guesses just to see a smaller number, which is also why the result has no edit button: corrections happen from the day page ([§3.3](#33-days)).
+
+- **Start over,** on any screen, begins a fresh thread. The old one is hidden and never scored, but kept: a log so wrong the user restarted it is the most valuable eval case.
+- Every guess keeps its status (stated, inferred, confirmed, rejected) and how it was inferred; dropped guesses stay as data ([§9.2](#92-data-rules)).
+- Guesses and questions carry **communication risk (ComRisk)**: the chance that they burden users enough to disengage. Users can switch questions off, or give the AI direct orders ([§6.3](#63-boundaries)).
 
 ### 3.3 Days
 
 - A day runs 04:00–04:00 in the user's timezone. 04:00 is the middle of a typical night (sleep around midnight to 08:00): a practical default, easy to change later because days are derived from stored times ([§9.2](#92-data-rules)). For unstable sleepers, contextual anchors ("when I wake up", "before work", "at lunchtime") keep the app useful. Onboarding asks about sleep stability (and stomach).
 - **Weeks** run Monday–Sunday and belong to the month their Monday falls in, numbered 1–5 within it (p32–33).
 - **Parts of the day:** a predefined set of labels at first (morning · lunchtime · afternoon · night · midnight), maybe user-defined later. A label implies a rough time, so users can tag meals without being specific, which suits end-of-day logging. An exact time, when given, is a better data point.
-- The **day page** shows the day's events in strict order. Users can reorder them; leaving without saving asks for confirmation.
+- The **day page** shows the day's events in strict order. Users can reorder them; leaving without saving asks for confirmation. Tapping an event reopens its thread to correct it.
 
 ### 3.4 Meal event
 
@@ -152,7 +167,9 @@ A **day complete** mark tells the analysis which days are fully logged, so missi
 ```mermaid
 erDiagram
     USER ||--o{ BODYWEIGHT_ENTRY : logs
-    USER ||--o{ MEAL_EVENT : logs
+    USER ||--o{ LOG_THREAD : starts
+    LOG_THREAD ||--|{ LOG_MESSAGE : holds
+    LOG_THREAD ||--o{ MEAL_EVENT : "finalized into"
     MEAL_EVENT ||--|{ ITEM : contains
     MEAL_EVENT ||--o{ CONTEXT_INFO : has
     USER ||--o{ GOAL : prioritizes
@@ -288,6 +305,8 @@ The app's AI acting as the user's personal dietitian, with expert dietitian, beh
 | Changing | Congratulate applied changes. When they fall short: be kind, show you noticed, offer a guilt-free way to log the reason and, if appropriate, solutions for next time |
 | Maintenance | Probably like onboarding |
 
+The comment appears with the log's result ([§3.2](#the-log-thread)).
+
 ### 6.2 Weekly session
 
 - One a week, for scarcity and realistic cooperation; the first comes after onboarding ([§5](#5-onboarding)).
@@ -301,7 +320,7 @@ The app's AI acting as the user's personal dietitian, with expert dietitian, beh
 
 ### 6.3 Boundaries
 
-The notes' "limiting dietitian beliefs": explicit rules users set for the AI, like "never ask me about exercise again" or "I don't use a scale". Listed in settings and undoable there; users are told so. Some hide features (workouts). For important ones the AI argues before accepting, e.g. the scale, the main progress measure.
+The notes' "limiting dietitian beliefs": explicit rules users set for the AI, like "never ask me about exercise again", "I don't use a scale" or "hide the numbers" (calories and macros, everywhere in the app). Listed in settings and undoable there; users are told so. Some hide features (workouts). For important ones the AI argues before accepting, e.g. the scale, the main progress measure.
 
 ### 6.4 Library
 
@@ -396,7 +415,7 @@ _Accepted from the council review, 23–27 Oct._
 
 | Job | Done by |
 | --- | --- |
-| Turn a log (text, voice transcript, photo) into meal events and items with nutrition estimates, in English | LLM |
+| Turn a log thread (text, voice transcript, photo description) into guesses, questions and finally meal events and items with nutrition estimates, in English | LLM |
 | Group a week's events into 3–5 habits and match them to existing ones ([§2.4](#24-habit-trends)) | LLM |
 | Comment on logs; run onboarding and weekly sessions | LLM |
 | Days, weeks, parts of day, units, unlocks, reminders | Code |
@@ -409,7 +428,7 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 | Topic | Rule | Why |
 | --- | --- | --- |
-| Raw input | Keep the user's original words (text or transcript). Don't keep raw audio or photos after processing | Re-parse old logs with better prompts or models; privacy; storage |
+| Raw input | Keep the user's original words (text or transcript) and each photo's AI description. Don't keep raw audio or photos after processing | Re-parse old logs with better prompts or models; privacy; storage |
 | AI outputs | Tag each with its prompt and model version | Know what to recompute; compare versions |
 | Time | Store when eaten as a UTC instant + IANA timezone, flagged as approximate when it comes from a part-of-day label; store when logged separately. Derive the day, week and part of day | End-of-day logging, travel, daylight saving |
 | Goals, calorie goal | Version them with start dates; never overwrite | Goal-mismatched overlays, lenses and the calorie-goal history need it |
@@ -453,7 +472,7 @@ flowchart LR
 
 | Area | Items |
 | --- | --- |
-| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; a global meal DB; photo history, much later, for users who like keeping food photos |
+| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; a global meal DB; storing photos, much later: a photo history for users who like it, or backend analysis |
 | Goals | Custom goal; keto; per-meal bodyweight usefulness; a workout-rules section on the goals page; imperial units |
 | AI dietitian | A user-chosen character; a short per-user md file defining how the AI speaks; a recipe book |
 | Screens | Exercise page (works like the supply page) and exercise advice; menstrual-cycle tracking and advice; hydration entry point; a brief app overview after onboarding |
