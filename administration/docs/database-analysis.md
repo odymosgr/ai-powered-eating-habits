@@ -248,6 +248,7 @@ Firebase's advantages are real but small to rebuild: an outbox for bad signal, a
 10. Shard-ready from the start: `user_id` on every table, child tables included, and first in every index.
 11. IDs are UUIDv7 (time-ordered), made by the app or the server; no global auto-increment counters.
 12. No query in the app reads across users. Shared reference data, like a future food database, gets copied; analytics go to a warehouse.
+13. Exit seams, so the platform can change: all app reads and writes go through one data-access module, never Supabase's client directly; function logic lives in plain TypeScript modules with thin Supabase wrappers, so it can run elsewhere (e.g. AWS Lambda); one module wraps sign-in and the current user. Leaving Supabase then takes two steps: self-host it with the same APIs, then swap pieces only if needed.
 
 **If you prefer Firebase anyway:** use the [§2.2](#22-document-firestore-on-firebase) design, plus composite indexes in the repo with smoke tests on a real project, budget alerts and one tested recursive delete. It works; it asks for more discipline in exchange for the mobile conveniences.
 

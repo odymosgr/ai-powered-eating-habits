@@ -1,7 +1,7 @@
 # AI-Powered Eating Habits — Product Plan
 
-**Version 4, 27 Oct 2026.** Built from the [paper notes](initial-notes/initial-notes.md) (6–26 Oct), the 7 Oct plan and the council review (closed 27 Oct, kept in git history). Where ideas changed, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
-Backend options: [database-analysis.md](database-analysis.md).
+**Version 5, 27 Oct 2026.** Built from the [paper notes](initial-notes/initial-notes.md) (6–26 Oct), the 7 Oct plan and the council review (closed 27 Oct, kept in git history). Where ideas changed, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
+Database analysis and backend design input: [database-analysis.md](database-analysis.md). Decisions over time: [building-log.md](building-log.md#decision-log).
 
 ## Contents
 
@@ -105,7 +105,7 @@ _Notes: p0, p4–5, p7, p9–10, p12, p18, p28, p32–33._
 
 - **Input:**
   - **Onboarding week: voice.** It gathers the most useful information, worth the extra friction, though speaking can be awkward in front of people.
-  - **After onboarding:** logging leans on easy photos, common meals (old habits) and the dietitian sessions. An image-to-text step turns a photo into a description; only the description is kept ([§9.2](#92-data-rules)).
+  - **After onboarding:** logging leans on common meals (old habits) and the dietitian sessions, and later on easy photos: an image-to-text step turns a photo into a description, and only the description is kept ([§9.2](#92-data-rules)).
   - **Text**, through the input field or chat, works anytime.
   - **Common meals:** quick logging from a page inside the meal logger, updated weekly, with history.
   - **Shared meals** need no special feature: users describe them loosely ("a little of this and some of that, at a dinner with friends") and the AI estimates.
@@ -171,7 +171,7 @@ erDiagram
     LOG_THREAD ||--|{ LOG_MESSAGE : holds
     LOG_THREAD ||--o{ MEAL_EVENT : "finalized into"
     MEAL_EVENT ||--|{ ITEM : contains
-    MEAL_EVENT ||--o{ CONTEXT_INFO : has
+    MEAL_EVENT ||--o{ CONTEXT_FACT : has
     USER ||--o{ GOAL : prioritizes
     USER ||--o{ HABIT : "has 3-5 a week"
     HABIT }o--o{ MEAL_EVENT : covers
@@ -409,7 +409,7 @@ To consider when building: bars that don't start at zero exaggerate small daily 
 
 ## 9. Technical foundations
 
-_Accepted from the council review, 23–27 Oct._
+_Decided 23–27 Oct, starting from the council review._
 
 ### 9.1 The AI extracts, code scores
 
@@ -448,10 +448,12 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 | Part | Decision |
 | --- | --- |
-| Client | React Native + Expo (locked 27 Oct): popular, long-lived, one TypeScript codebase, the best support from AI coding agents |
-| Backend and database | Open. Proposal: relational, Postgres on Supabase ([database-analysis.md](database-analysis.md)) |
+| Client | React Native + Expo, locked 27 Oct ([why](building-log.md#decision-log)) |
+| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](building-log.md#decision-log); [analysis](database-analysis.md)) |
 | LLM | Provider-agnostic, so each job can compare models from different providers. Vercel AI SDK + promptfoo for now; details when building |
 | Connectivity | Online only: offline-first costs too much for a first app |
+
+**Modularity:** data access, function logic and auth sit behind our own modules, so the platform can change later (self-hosted Supabase, or AWS). Details come with the backend design ([database-analysis.md §6](database-analysis.md#6-proposal)).
 
 ## 10. Scope
 
