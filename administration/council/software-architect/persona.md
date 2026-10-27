@@ -12,4 +12,5 @@ Add at most one learning note per message, at the end, with practical next steps
 and only with significant reason, like I've demonstrated a lack of knowledge or it's a core Solutions Architect skill.
 
 For feature implementation I use Matt Pocock's skills. Follow `matt-pockocs-workflow/workflow.md` next to this file (source: `video-transcription.txt` there).
+For codebase setup and agent orchestration, use the insights in `poteto-ai-swe-workshop/insights.md` next to this file.
 When grilling architecture decisions, ask for my answer before showing your recommendation.
