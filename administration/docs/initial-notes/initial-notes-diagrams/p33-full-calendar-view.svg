@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 600" width="680" height="600" role="img" aria-label="Full Calendar View wireframe: a year of months as rows and weeks 1 to 5 as columns, each week's average bodyweight as a point on a line with its trend above, plus the label placement rules and dotted lines for inferred averages">
+<title>Full Calendar View wireframe: a year of months as rows and weeks 1 to 5 as columns, each week's average bodyweight as a point on a line with its trend above, plus the label placement rules and dotted lines for inferred averages</title>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1e40af"/>
+  </marker>
+</defs>
+<style>
+  text { font-family: Helvetica, Arial, sans-serif; fill: #1e40af; font-size: 14px; }
+  .s { font-size: 12px; }
+  .b { font-weight: bold; }
+  .ln { fill: none; stroke: #1e40af; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .box { fill: none; stroke: #1e40af; stroke-width: 1.6; }
+  .dot { fill: none; stroke: #1e40af; stroke-width: 1.6; stroke-dasharray: 3 5; stroke-linecap: round; }
+  .hatch { fill: none; stroke: #1e40af; stroke-width: 1; opacity: 0.5; }
+  .pt { fill: #1e40af; }
+</style>
+<rect x="0.5" y="0.5" width="679" height="599" rx="10" fill="#fffef8" stroke="#e5e7eb"/>
+<rect x="240" y="18" width="200" height="34" rx="3" class="box"/>
+<text x="340" y="40" text-anchor="middle" class="b">Full Calendar View</text>
+<text x="320" y="92" text-anchor="middle">&lt;Title&gt;</text>
+<circle cx="370" cy="87" r="11" class="box"/>
+<text x="370" y="92" text-anchor="middle">?</text>
+<text x="320" y="128" text-anchor="middle">– 2026 –</text>
+<rect x="70" y="140" width="460" height="200" class="box"/>
+<path d="M70,240 L530,240" class="ln"/>
+<path d="M130,140 L130,340" class="ln"/>
+<path d="M210,140 L210,340 M290,140 L290,340 M370,140 L370,340 M450,140 L450,340" class="ln"/>
+<path d="M130,158 L450,158 M130,220 L450,220 M130,258 L530,258 M130,320 L530,320" class="ln"/>
+<path d="M450,160 L470,140 M450,180 L490,140 M450,200 L510,140 M450,220 L530,140 M450,240 L530,160 M470,240 L530,180 M490,240 L530,200 M510,240 L530,220" class="hatch"/>
+<rect x="290" y="140" width="80" height="100" fill="none" stroke="#1e40af" stroke-width="3.2"/>
+<text x="100" y="196" text-anchor="middle">Feb</text>
+<text x="100" y="296" text-anchor="middle">Jan</text>
+<text x="170" y="153" text-anchor="middle" class="s">−1.1%</text>
+<text x="250" y="153" text-anchor="middle" class="s">−0.5%</text>
+<text x="330" y="153" text-anchor="middle" class="s">N/A</text>
+<text x="410" y="153" text-anchor="middle" class="s">N/A</text>
+<path d="M134,186 L170,182 L250,196 L330,206" class="ln"/>
+<circle cx="170" cy="182" r="3.5" class="pt"/>
+<circle cx="250" cy="196" r="3.5" class="pt"/>
+<circle cx="330" cy="206" r="3.5" class="pt"/>
+<text x="178" y="173" class="s">70.8</text>
+<text x="258" y="187" class="s">70.4</text>
+<text x="170" y="234" text-anchor="middle" class="s">Week 1</text>
+<text x="250" y="234" text-anchor="middle" class="s">Week 2</text>
+<text x="330" y="234" text-anchor="middle" class="s">Week 3</text>
+<text x="410" y="234" text-anchor="middle" class="s">Week 4</text>
+<text x="170" y="253" text-anchor="middle" class="s">−0.6%</text>
+<text x="250" y="253" text-anchor="middle" class="s">−1.0%</text>
+<text x="330" y="253" text-anchor="middle" class="s">+0.3%</text>
+<text x="410" y="253" text-anchor="middle" class="s">N/A</text>
+<text x="490" y="253" text-anchor="middle" class="s">−0.5%</text>
+<path d="M134,278 L170,280 L250,300 L330,294" class="ln"/>
+<path d="M330,294 L410,278 L490,288" class="dot"/>
+<path d="M490,288 L526,290" class="ln"/>
+<circle cx="170" cy="280" r="3.5" class="pt"/>
+<circle cx="250" cy="300" r="3.5" class="pt"/>
+<circle cx="330" cy="294" r="3.5" class="pt"/>
+<circle cx="410" cy="278" r="3.5" class="pt"/>
+<circle cx="490" cy="288" r="3.5" class="pt"/>
+<text x="178" y="272" class="s">x</text>
+<text x="258" y="314" class="s">x</text>
+<text x="338" y="308" class="s">x</text>
+<text x="418" y="271" class="s">x</text>
+<text x="498" y="281" class="s">x</text>
+<text x="170" y="334" text-anchor="middle" class="s">Week 1</text>
+<text x="250" y="334" text-anchor="middle" class="s">Week 2</text>
+<text x="330" y="334" text-anchor="middle" class="s">Week 3</text>
+<text x="410" y="334" text-anchor="middle" class="s">Week 4</text>
+<text x="490" y="334" text-anchor="middle" class="s">Week 5</text>
+<path d="M538,244 L544,244 L544,316 L538,316" class="ln"/>
+<text x="550" y="262" class="s">Monthly BW</text>
+<text x="550" y="277" class="s">window</text>
+<text x="550" y="296" class="s">(thoroughly</text>
+<text x="550" y="311" class="s">considered so</text>
+<text x="550" y="326" class="s">every visual fits)</text>
+<text x="300" y="368" text-anchor="middle">…</text>
+<text x="40" y="430">Avg BW placement:</text>
+<path d="M195,440 L215,425 L235,440" class="ln"/>
+<circle cx="215" cy="425" r="3.5" class="pt"/>
+<text x="223" y="416" class="s">x</text>
+<path d="M265,398 L265,452" class="ln"/>
+<path d="M295,420 L315,435 L335,420" class="ln"/>
+<circle cx="315" cy="435" r="3.5" class="pt"/>
+<text x="323" y="451" class="s">x</text>
+<path d="M365,398 L365,452" class="ln"/>
+<path d="M395,442 L435,418" class="ln"/>
+<circle cx="415" cy="430" r="3.5" class="pt"/>
+<text x="423" y="446" class="s">x</text>
+<path d="M465,398 L465,452" class="ln"/>
+<path d="M495,418 L535,442" class="ln"/>
+<circle cx="515" cy="430" r="3.5" class="pt"/>
+<text x="523" y="422" class="s">x</text>
+<text x="40" y="500">Inferred avg BW:</text>
+<path d="M200,545 L230,525 L260,545" class="ln"/>
+<circle cx="230" cy="525" r="3.5" class="pt"/>
+<text x="238" y="516" class="s">x</text>
+<path d="M290,535 L358,535" class="ln" marker-end="url(#arr)"/>
+<path d="M390,545 L420,525 L450,545" class="dot"/>
+<circle cx="420" cy="525" r="3.5" class="pt"/>
+<text x="428" y="516" class="s">x</text>
+<text x="640" y="585" text-anchor="end" class="s">-33-</text>
+</svg>

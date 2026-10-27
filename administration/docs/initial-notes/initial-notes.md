@@ -1,6 +1,6 @@
-# Paper Notes: Diet App Product Thinking (6–15 Oct 2026)
+# Paper Notes: Diet App Product Thinking (6–26 Oct 2026)
 
-A faithful transcription of ~31 handwritten A4 pages, in their original order. Page 0 is the part of the README that was filled in before the paper process began.
+A faithful transcription of ~33 handwritten A4 pages, in their original order. Page 0 is the part of the README that was filled in before the paper process began.
 This file records how the ideas evolved, so it does not reorganize or deduplicate them. Later pages sometimes revise earlier ones, and both versions are kept.
 Sketches whose layout carries meaning are redrawn as SVGs in [initial-notes-diagrams/](initial-notes-diagrams/), close to the paper originals in [initial-notes-paper-photos/](initial-notes-paper-photos/). Simple chains stay in Mermaid.
 
@@ -18,7 +18,7 @@ Sketches whose layout carries meaning are redrawn as SVGs in [initial-notes-diag
 
 Words squeezed in above or below a line (afterthoughts added where there was no room) are merged inline where they belong.
 
-Abbreviations used on paper: **OB** = onboarding · **bw / b/w** = bodyweight · **Str/Hyp** = strength / hypertrophy · **Com.Risk** = communication risk · **d.d.p.** = diet defining percentage · **hp** = high-protein · **Gl.M.DB** = global meal DB.
+Abbreviations used on paper: **OB** = onboarding · **bw / b/w** = bodyweight · **Str/Hyp** = strength / hypertrophy · **Com.Risk** = communication risk · **d.d.p.** = diet defining percentage · **hp** = high-protein · **Gl.M.DB** = global meal DB · **CTA** = call to action.
 
 ## Contents
 
@@ -34,6 +34,7 @@ Abbreviations used on paper: **OB** = onboarding · **bw / b/w** = bodyweight ·
 | 13.10 | [20](#page-20--1310) · [21](#page-21) · [22](#page-22) · [23](#page-23) · [24](#page-24) · [25](#page-25) | Measuring progress, habit history, habit trends, user's goals, usefulness |
 | 14.10 | [26](#page-26--1410) · [27](#page-27) · [28](#page-28) | Biggest selling point, diet rules and macros |
 | 15.10 | [29](#page-29--1510) · [30](#page-30) · [31](#page-31) | Design / wireframes: homepage elements |
+| 26.10 | [32](#page-32--2610) · [33](#page-33) | Weight Room wireframes: Weight Viewer, Full Calendar View |
 
 Pages without a date continue the session of the last dated page before them.
 
@@ -721,9 +722,43 @@ flowchart LR
 
 ---
 
+## Page 32 — 26.10
+
+### Weight Viewer *(boxed title)*
+
+`[Drawing: small icon next to the title, unclear]`
+
+![Weight Viewer wireframe: trend header with help button, weekly bar chart with a dotted goal line, week info, week picker carousel, full calendar button and the log and edit buttons](initial-notes-diagrams/p32-weight-viewer.svg)
+
+The labels x1–x5 above the bars are written as is, like placeholder values. Below a line drawn across the page:
+
+- Each week belongs to the month Monday lands.
+- The visible b/w window should be small enough for the bar height diffs to be meaningful (like 5 kg) but large enough to fit the data.
+- Possibly outright refuse the user to enter huge diffs.
+- Carousel elements filled with a soft bg color. Fill height represents the data completeness (x/7).
+- The selected week should be on the center of the carousel. Not as currently drawn. (Except if it's the initial or last.)
+
+---
+
+## Page 33
+
+### Full Calendar View *(boxed title)*
+
+- Each week belongs to a month and a year, with a number 1–5 for order.
+- Each week has an avg. b/w and possibly a trend number.
+
+![Full Calendar View wireframe: months as rows and weeks 1 to 5 as columns, each week's average bodyweight on a line with its trend above, label placement rules and dotted lines for inferred averages](initial-notes-diagrams/p33-full-calendar-view.svg)
+
+February's week 3 has a bold border, and its fifth cell is hatched.
+
+- **Avg BW Placement:** `[Drawing: four mini lines (peak, valley, rising, falling), each with the value label placed away from the line]`
+- If Avg BW is inferred ~~due to missing data~~ from far away values, or due to missing data: make the lines dotted.
+
+---
+
 ## Transcription notes
 
-**Page numbering.** All 32 photos are in order. Two different sheets are both marked **-10-**: the "Meal event" continuation (9.10) and the "Personal Dietitian Session" page (10.10). Both keep the number 10 here. The second one is labelled "second sheet marked 10".
+**Page numbering.** All 34 photos are in order. Two different sheets are both marked **-10-**: the "Meal event" continuation (9.10) and the "Personal Dietitian Session" page (10.10). Both keep the number 10 here. The second one is labelled "second sheet marked 10".
 
 **Uncertain readings `[?]`:**
 - p.2: "food that starts with the letter **L (Loser)**". Read this way because the 7 Oct product plan uses the same "L for loser" example.
@@ -733,6 +768,14 @@ flowchart LR
 - p.29: the end of the crossed-out line "except if the user is …" can't be read.
 - p.21: the Meal Map is a best-effort redraw of where the two lines run. Habit 2's wavy line seems to branch from Wednesday down to the late Thursday and Friday meals.
 
+**Pages 32–33 (26.10):**
+- p.32: the first carousel card's "4" is written over another digit.
+- p.32: the example dates are illustrative. 21.1.2026 is a Wednesday, and under the Monday rule January 2026 has only 4 weeks (Mondays 5, 12, 19, 26), so there is no "Jan '26 week 5".
+- p.32: two crossed-out words, after "huge" and after "soft bg color.", can't be read.
+- p.33: a first attempt at the calendar and a small box above the grid are scribbled out and omitted.
+- p.33: in the January row, the value labels are redrawn following the placement rule; the sketch places them loosely.
+- p.33: January's trend row is empty on paper, kept as space in the design. The redraw fills it with example values, including an N/A week whose average is inferred, so its lines are dotted.
+
 **Other marks not transcribed:** small ✓ ticks at the top-left of pp. 26, 27 and 29 (and possibly 25), and small doodles and ink dots that don't carry meaning.
 
-**Spelling fixes:** obvious misspellings were corrected silently, e.g. phycologist → psychologist, helpfull → helpful, lonelyness → loneliness, infered → inferred, weat → week, Adhearance → Adherence, Custome → Custom, Scarecity → Scarcity, expedeture → expenditure, accomondate → accommodate, benefitial → beneficial, flating → floating, personilized → personalized, hyration → hydration, Complain Service → Complaint Service. "Dietician" and "dietitian" are both written as **dietitian**. Words that are wordplay or deliberate were kept: "laaarge", "maaaybe", "maingaining", "mishappening", "American madness".
+**Spelling fixes:** obvious misspellings were corrected silently, e.g. phycologist → psychologist, helpfull → helpful, lonelyness → loneliness, infered → inferred, weat → week, Adhearance → Adherence, Custome → Custom, Scarecity → Scarcity, expedeture → expenditure, accomondate → accommodate, benefitial → beneficial, flating → floating, personilized → personalized, hyration → hydration, Complain Service → Complaint Service, meaningfull → meaningful. "Dietician" and "dietitian" are both written as **dietitian**. Words that are wordplay or deliberate were kept: "laaarge", "maaaybe", "maingaining", "mishappening", "American madness".
