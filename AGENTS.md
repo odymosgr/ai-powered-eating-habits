@@ -16,6 +16,7 @@
 ## Documentation and planning
 
 - Use md files for text. Ask for permission if there is a good reason for using other file types
+- For important planning decisions that shape the app's future, challenge my ideas before writing them down: give reasoned refutations and refinements, resolve them with me, then document the result. Skip this for small changes
 - Visuals, never ASCII art:
   - Mermaid (inline in the md, or a `.mmd` file when several docs reuse it): default. Use the diagram type that best fits the concept (flowchart, sequence, mindmap, state, ER, timeline...)
   - SVG: only when Mermaid can't show the concept clearly (custom or illustrative layouts). Agents write and edit them; embed with `![alt](file.svg)`
