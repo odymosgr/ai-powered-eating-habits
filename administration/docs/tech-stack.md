@@ -1,31 +1,17 @@
-# Tech Stack — The Big Picture
+# Tech Stack and Codebase
 
-**27 Oct 2026.** How React Native + Expo and Supabase work together in our app, at three depths, following one meal log through its thread ([plan §3.2](product-plan.md#the-log-thread)). Facts checked against official docs on 27 Oct 2026. Design marked *open* gets decided in a later grilling. Stack decisions: [plan §9.4](product-plan.md#94-stack); backend design: [database-analysis.md](database-analysis.md).
+**28 Oct 2026.** How the app's technologies fit together, where our code lives, and how agents work on it in parallel. Facts checked against the official docs on 27–28 Oct 2026. Stack decisions: [plan §9.4](product-plan.md#94-stack). Backend rules: [database-analysis.md §6](database-analysis.md#6-proposal).
 
 ## Contents
 
-1. [Level 1: the picture](#1-level-1-the-picture)
-2. [Level 2: one meal log's journey](#2-level-2-one-meal-logs-journey)
-3. [Level 3: under the hood](#3-level-3-under-the-hood)
-4. [Watch first](#4-watch-first)
+1. [The picture](#1-the-picture)
+2. [One meal log's journey](#2-one-meal-logs-journey)
+3. [Keys and access](#3-keys-and-access)
+4. [Folders](#4-folders)
+5. [Working with agents](#5-working-with-agents)
+6. [Official docs](#6-official-docs)
 
-## 1. Level 1: the picture
-
-```mermaid
-flowchart LR
-    P["Phone<br/>our app: React Native + Expo"] <-->|"HTTPS and live updates"| S["Supabase<br/>Postgres + ready-made services<br/>+ our functions"]
-    S <-->|"parse request and result"| L["LLM provider"]
-```
-
-- **Phone:** our app is TypeScript written with React. React Native draws its components as real native views, not a web page. Expo is the toolkit around it: native modules as packages, navigation where each file is a screen, and the service that builds an installable app.
-- **Supabase:** our backend. A hosted Postgres database with services around it: an HTTP API generated from our tables, sign-in, live updates, and server functions where our backend code runs.
-- **LLM:** called only from a Supabase function. Its API key costs money per call, and anything shipped inside the app can be extracted.
-- **One meal log:** the app saves your words in Postgres; a function asks the LLM to parse them and saves the result; the screen updates by itself.
-- **The rule behind it:** the AI extracts, code scores ([plan §9.1](product-plan.md#91-the-ai-extracts-code-scores)). The LLM turns words into data, including each item's nutrition estimate; totals, days and scores come from our code.
-
-## 2. Level 2: one meal log's journey
-
-### 2.1 Where each piece of code runs
+## 1. The picture
 
 ```mermaid
 flowchart LR
@@ -46,17 +32,13 @@ flowchart LR
     fn -->|"secret API key"| llm
 ```
 
-| Our code | Runs on | Written in |
-| --- | --- | --- |
-| Screens, components, client state, data-access and auth modules, outbox | Phone, inside the app | TypeScript (React) |
-| Shared scoring package | Phone, functions, Mac (evals) | TypeScript |
-| Parse function and other function logic, with their prompts | Supabase Edge Functions | TypeScript (Deno runtime), prompt files |
-| Schema, constraints, RLS policies, RPC functions, cron jobs | Postgres, shipped as SQL migrations | SQL |
-| Evals, re-parse scripts | Mac and CI | TypeScript, promptfoo |
+- **Phone:** our app is TypeScript written with React. React Native draws it as real native views. Expo adds native modules as packages, navigation where each file is a screen, and the build tools. A JavaScript change reaches the phone at once; a library with native code needs a new build.
+- **Supabase:** a hosted Postgres with services around it: an HTTP API generated from our tables, sign-in, live updates, and Edge Functions, where our server code runs.
+- **LLM:** called only from an Edge Function. Its API key costs money per call, and anything shipped in the app can be extracted.
+- **The AI extracts, code scores** ([plan §9.1](product-plan.md#91-the-ai-extracts-code-scores)): the LLM turns words into data; our code computes totals and scores.
+- **Exit seams:** our code reaches Supabase only through our own modules, so the platform stays replaceable ([guardrail 13](database-analysis.md#6-proposal)).
 
-While building, three more things run: **Metro** on the Mac bundles our TypeScript and sends it to the phone on every save; the **Supabase CLI** runs the same backend locally in Docker for tests; **EAS**, Expo's cloud, builds the installable app.
-
-### 2.2 The journey
+## 2. One meal log's journey
 
 ```mermaid
 sequenceDiagram
@@ -83,98 +65,99 @@ sequenceDiagram
     App->>You: 5. Result: totals from shared code
 ```
 
-| Step | Where | Why there |
-| --- | --- | --- |
-| Save the words | Phone → Data API → Postgres | Words are raw input, which clients may write. RLS checks the row is yours, constraints check its shape, phone-made IDs make a retry harmless |
-| Parse | Edge Function | It holds the LLM key, and it keeps going if the phone loses signal |
-| Show guesses | Postgres → Realtime → phone | The screen updates when the draft lands, without asking repeatedly |
-| Drop, lock, answer, Done | Phone → Postgres | Your choices are raw input too |
-| Draft becomes rows | Postgres, in an RPC function | Several tables in one transaction, which supabase-js can't do; nutrition numbers never come from the client |
-| Result, day page | Phone, shared scoring package | Totals computed from the items' estimates. The day page is one query over a time range |
+*Open, decided when the log thread is grilled:* who starts the parse (a database webhook, or the app after saving), and live updates or polling.
 
-*Open:* who starts the parse (a database webhook, or the app after saving), and live updates or polling.
+## 3. Keys and access
 
-### 2.3 What each platform gives us
-
-| | Gives us | We write |
-| --- | --- | --- |
-| React Native | React components drawn as native views; the JavaScript engine; core components (`View`, `Text`, `TextInput`, lists) | Screens and components |
-| Expo | Native modules as packages; Expo Router (each file in `src/app/` is a screen); the dev server; development builds; EAS cloud builds, over-the-air updates and push notifications | Route files, app config |
-| Supabase | Postgres and its extensions; the Data API generated from our tables; Auth; Realtime; Edge Functions; Cron and Queues; the dashboard; a CLI with a local stack, migrations, type generation, database tests and security advisors | Schema, RLS policies, RPC functions, the parse function, prompts, evals |
-
-Our code reaches Supabase only through modules of our own, so the Supabase box stays replaceable ([database-analysis.md §6](database-analysis.md#6-proposal), guardrail 13).
-
-## 3. Level 3: under the hood
-
-### 3.1 From TypeScript to pixels
-
-```mermaid
-flowchart LR
-    ts["Our TypeScript"] --> metro["Metro bundler"] --> hermes["Hermes engine<br/>runs React"]
-    hermes --> fabric["Renderer (Fabric)<br/>layout with Yoga"] --> views["Native views<br/>on the UI thread"]
-    hermes <-->|"JSI: direct calls"| modules["Native modules<br/>compiled into the app"]
-```
-
-- **Two kinds of code in the app.** JavaScript (ours, bundled by Metro) and native code (React Native and Expo modules, compiled into the app binary). Changing JavaScript needs no new build: in development Metro sends it on every save; after release, EAS Update ships it over the air. Adding a native module needs a new build.
-- **Hermes** runs the JavaScript on the phone. React computes what the screen should show; the renderer lays it out with Yoga (Flexbox, no CSS cascade) and creates real views (`UIView` on iOS, `ViewGroup` on Android). Since React Native 0.82 everything runs on the New Architecture, where JavaScript calls native code directly through JSI; the asynchronous "bridge" in older videos is gone.
-- **Expo Go vs a development build.** Expo Go is a prebuilt app with a fixed set of native modules; Expo calls it an educational tool, and its version for a new SDK reaches the stores weeks after release. A development build is our own Expo Go: our native modules plus the dev tools, installed once, then reloaded from Metro.
-- **No native folders to maintain.** Expo generates the `ios/` and `android/` projects from the app config (continuous native generation), so we write TypeScript and config only.
-
-### 3.2 What a request may do
-
-```mermaid
-flowchart LR
-    req["App request:<br/>publishable key + your token"] --> api["Data API: checks the token,<br/>acts as role 'authenticated'"]
-    api --> grant{"Grant on<br/>the table?"}
-    grant -- "no" --> deny["Refused"]
-    grant -- "yes" --> rls["RLS: only rows where<br/>user_id = auth.uid()"]
-    rls --> cons["Constraints: types, unique,<br/>foreign keys, JSON schema"]
-    cons --> commit["Commit"] --> rt["Realtime re-checks RLS<br/>for each subscriber"]
-```
-
-- **Your token** comes from Supabase Auth at sign-in, is stored on the phone and tells Postgres who you are (`auth.uid()`). How slice 1 signs in without accounts is *open*.
-- **Grants decide if a role may touch a table at all; RLS decides which rows.** Since 2026 new tables get no grants by default (all existing projects from 30 Oct 2026), so each migration grants explicitly. Constraints check every write, even from functions that bypass RLS.
+Grants decide whether a role may touch a table at all; RLS decides which rows. New tables get no grants by default since 2026, so each migration grants explicitly. Constraints check every write, even from functions that bypass RLS.
 
 | Key | Lives | Can do |
 | --- | --- | --- |
 | Publishable (`sb_publishable_…`) | In the app; public by design | Only what grants and RLS allow |
-| Your access token | On the phone, after sign-in | Identifies you to RLS |
+| Your access token | On the phone, after sign-in | Identifies you to RLS (`auth.uid()`) |
 | Secret (`sb_secret_…`) | Function secrets only | Bypasses RLS, not constraints |
 | LLM API keys | Function secrets only | Spends money per call |
 
 The legacy `anon` and `service_role` keys are deprecated by the end of 2026, but agents trained on older examples still reach for them.
 
-### 3.3 How the parse survives failures
+## 4. Folders
 
-- The database webhook (`pg_net`) fires once: it waits 2 seconds by default and never retries. So the function answers at once and keeps working in the background (`EdgeRuntime.waitUntil`).
-- A function run lasts at most 150 s on the free plan and 2 s of CPU per request. Waiting for the LLM is network I/O, so it doesn't count as CPU.
-- A parse status on each thread, plus a cron job that re-sends threads stuck too long, means every log ends parsed or visibly failed. Re-running must be harmless: the draft is replaced, never appended.
-
-*Open, a sketch of the statuses:*
+One Expo project at the repo root, with `supabase/` inside it. A folder appears when a step first needs it. A feature's code may span several folders: the aim is parallel agent work ([§5](#5-working-with-agents)), not one folder per feature.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> pending: words saved
-    pending --> parsing: function picks it up
-    parsing --> parsed: draft saved
-    parsing --> failed: LLM error or bad output
-    failed --> pending: sweeper retries
-    parsing --> pending: sweeper finds it stuck
-    parsed --> pending: Add more
-    parsed --> done: Done
-    done --> [*]
+flowchart LR
+    routes["src/app/<br/>routes"] --> features["src/features/*/<br/>screens, hooks"]
+    features --> ui["src/components/ui/"]
+    features --> lib["src/lib/<br/>supabase · data · auth"]
+    features --> shared["src/shared/<br/>scoring, LLM schema"]
+    lib --> sb[("Supabase")]
+    fn["supabase/functions/"] --> shared
+    evals["evals/"] --> shared
 ```
 
-## 4. Watch first
+Arrows are imports; lint blocks the rest ([§5](#5-working-with-agents)).
 
-In order, about 55 minutes. All links checked on 27 Oct 2026.
+| Path | Holds | Runs on |
+| --- | --- | --- |
+| `src/app/` | Routes and layouts only (Expo Router): one-line files exporting a screen from its feature | Phone |
+| `src/features/<feature>/` | Screens, components, hooks in `api.ts` (TanStack Query), tests | Phone |
+| `src/components/ui/` | UI pieces that two or more features use | Phone |
+| `src/lib/` | `supabase.ts`, the only Supabase client; `data/<feature>.ts`, all reads and writes as plain functions; `auth.ts`, sign-in and the current user; later `outbox.ts` | Phone |
+| `src/shared/` | Plain TypeScript, free of React and Supabase: scoring, the LLM output schema | Phone, functions, Mac |
+| `supabase/migrations/` | The schema as ordered SQL: tables, grants, RLS, RPC functions | Postgres |
+| `supabase/functions/<name>/` | One Edge Function: a thin `index.ts` around plain modules | Edge Functions (Deno) |
+| `supabase/tests/` | pgTAP tests, at least one per table | Local stack, CI |
+| `evals/` | promptfoo configs and datasets ([plan §9.3](product-plan.md#93-ai-engineering-habits)) | Mac, CI |
+| `.github/workflows/` | CI running the checks | GitHub |
 
-| # | What | Type | Why |
+- **Conventions:** kebab-case file names; `@/` imports instead of `../`; tests beside their code as `*.test.ts(x)`, never in `src/app/`, where every file is a route.
+- **Open risk:** Deno may not resolve imports from `src/shared/`. Setup step 9 tests it; if it fails, the folder moves to `supabase/functions/_shared/`.
+
+**Feature map.** Each feature ticket keeps its row current.
+
+| Feature | Phone | Data | Backend |
 | --- | --- | --- | --- |
-| 1 | [React Native in 100 Seconds](https://www.youtube.com/watch?v=gvkqT_Uoahw) (Fireship) | Video, 2 min, 2021 | The core idea. Its "bridge" is outdated ([§3.1](#31-from-typescript-to-pixels)) |
-| 2 | [Core Components and Native Components](https://reactnative.dev/docs/intro-react-native-components) (React Native docs) | Read, 3 min | How a `<View>` becomes a native view |
-| 3 | [Expo Router core concepts](https://docs.expo.dev/router/basics/core-concepts/) (Expo docs) | Read, 5 min | A file is a screen: this shapes our folders |
-| 4 | [Expo Go & Development Builds: Which should you use?](https://www.youtube.com/watch?v=FdjczjkwQKE) (Expo) | Video, 22 min, 2024 | The build model for your phone. Expo Go's store situation changed in 2026 ([§3.1](#31-from-typescript-to-pixels)) |
-| 5 | [Supabase in 100 Seconds](https://www.youtube.com/watch?v=zBZgdTb-dns) (Fireship) | Video, 3 min, 2022 | The whole product at once; the dashboard has changed since |
-| 6 | [Architecture](https://supabase.com/docs/guides/getting-started/architecture) (Supabase docs) | Read, 5 min | Each service in the Supabase box of [§2.1](#21-where-each-piece-of-code-runs) |
-| 7 | [Use Supabase with Expo React Native](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native) (Supabase docs) | Hands-on, 15 min | Both halves talking, with the publishable key and RLS |
+| `auth` | `src/features/auth/` | `src/lib/auth.ts` | Supabase Auth, sign-ups off |
+| `day` | `src/features/day/` | `src/lib/data/day.ts` | Reads meal events and bodyweights |
+| `bodyweight` | `src/features/bodyweight/` | `src/lib/data/bodyweight.ts` | `bodyweights` table |
+| `meal-log` | `src/features/meal-log/` | `src/lib/data/meal-log.ts` | Log-thread and meal tables, `parse-log` function |
+
+## 5. Working with agents
+
+The aim: several agents at work at once, none touching another's files, each proving its work without the phone.
+
+| Check | Runs | When |
+| --- | --- | --- |
+| `npm run check` | TypeScript, ESLint with Prettier, Jest | Before calling any change done; CI on every pull request |
+| `npm run test:db` | pgTAP on the local Supabase stack | When `supabase/` changed; CI |
+| `npm run evals` | promptfoo | When a prompt or model changed; comes with `parse-log` |
+
+- **One owner per file.** Expo Router needs no central route list, so a new screen is a new file. Shared files (`_layout.tsx` files, `src/components/ui/`, `src/lib/supabase.ts`, `package.json`) change in small tickets of their own. No `index.ts` barrels that every feature edits.
+- **Typed edges.** Features meet only through `src/lib/` and `src/shared/`. Lint stops a feature importing another feature, and anything outside `src/lib/` importing Supabase.
+- **One worktree per agent,** each with its own branch and `npm install`.
+- **Database changes go one at a time.** All worktrees share one local Supabase stack, and migrations run in order. Phone-only tickets run in parallel.
+- **Regenerate, don't merge.** On a conflict in `package-lock.json` or the database types, rerun `npm install` or `npm run gen:types`.
+- **Folder rules** live in that folder's `AGENTS.md`, beside a one-line `CLAUDE.md` holding `@AGENTS.md`. With a `CLAUDE.md` at the repo root, that pair is how Claude Code reads a folder's rules ([docs](https://code.claude.com/docs/en/memory#agents-md)). The first is `supabase/` (setup step 6).
+
+## 6. Official docs
+
+Check the docs for the installed version before using an API: Expo, React Native and Supabase change with every release.
+
+| Technology | Docs | Start with |
+| --- | --- | --- |
+| TypeScript | [typescriptlang.org](https://www.typescriptlang.org/docs/) | |
+| React Native | [reactnative.dev](https://reactnative.dev/docs/getting-started) | [Core Components and Native Components](https://reactnative.dev/docs/intro-react-native-components) |
+| Expo SDK 58 | [docs.expo.dev](https://docs.expo.dev/versions/v58.0.0/) | [Expo Router core concepts](https://docs.expo.dev/router/basics/core-concepts/) · [Expo Go & development builds](https://www.youtube.com/watch?v=FdjczjkwQKE) (video, 22 min) |
+| Supabase | [supabase.com/docs](https://supabase.com/docs) | [Architecture](https://supabase.com/docs/guides/getting-started/architecture) · [Use Supabase with Expo](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native) |
+| TanStack Query | [tanstack.com/query](https://tanstack.com/query/latest/docs/framework/react/overview) | [React Native](https://tanstack.com/query/latest/docs/framework/react/react-native) |
+| Jest, React Native Testing Library | [jestjs.io](https://jestjs.io/docs/getting-started) · [RNTL](https://callstack.github.io/react-native-testing-library/) | [Expo's unit testing guide](https://docs.expo.dev/develop/unit-testing/) |
+| ESLint, Prettier | [eslint.org](https://eslint.org/docs/latest/) · [prettier.io](https://prettier.io/docs/) | [Expo's ESLint guide](https://docs.expo.dev/guides/using-eslint/) |
+| pgTAP | [pgtap.org](https://pgtap.org/documentation.html) | [Supabase's testing overview](https://supabase.com/docs/guides/local-development/testing/overview) |
+| GitHub Actions | [docs.github.com](https://docs.github.com/en/actions) | |
+| Vercel AI SDK | [ai-sdk.dev](https://ai-sdk.dev/docs/introduction) | With the parse function |
+| promptfoo | [promptfoo.dev](https://www.promptfoo.dev/docs/intro/) | With the evals |
+
+For ideas, not rules: the [Obytes template][obytes] for app structure, and [Supabase's Expo example][sb-example] for Supabase wiring.
+
+[obytes]: https://github.com/obytes/react-native-template-obytes/tree/fd9b358ed11913d2a49fd9ffa6582fe03ba130e7
+[sb-example]: https://github.com/supabase/supabase/tree/2a8dc75e3d89f590cdc427a1f65273c910508575/examples/user-management/expo-user-management
