@@ -17,9 +17,11 @@
 
 - Use md files for text. Ask for permission if there is a good reason for using other file types
 - For important planning decisions that shape the app's future, challenge my ideas before writing them down: give reasoned refutations and refinements, resolve them with me, then document the result. Skip this for small changes
+- Clarify decisions with me in our sessions, not in docs: docs record only the outcome. Exception: throwaway docs I ask for, to help me understand or in other tasks
 - Visuals, never ASCII art:
   - Mermaid (inline in the md, or a `.mmd` file when several docs reuse it): default. Use the diagram type that best fits the concept (flowchart, sequence, mindmap, state, ER, timeline...)
   - SVG: only when Mermaid can't show the concept clearly (custom or illustrative layouts). Agents write and edit them; embed with `![alt](file.svg)`
+- Reading docs is slow and costly for me, and I must understand all of them: keep docs few, holding only the important parts
 - Write the shortest version that preserves all distinct ideas
 - State each idea once. Reference its original section instead of repeating it
 - When organizing random thoughts or braindumps use logical groupings for easier human understanding
