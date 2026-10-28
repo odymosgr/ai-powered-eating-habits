@@ -452,6 +452,7 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 | Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](building-log.md#decision-log); [analysis](database-analysis.md)) |
 | LLM | Provider-agnostic, so each job can compare models from different providers. Vercel AI SDK + promptfoo for now; details when building |
 | Connectivity | Online only: offline-first costs too much for a first app |
+| Codebase | One Expo project with Supabase inside, laid out so agents can work in parallel, decided 28 Oct ([layout](tech-stack.md#4-folders)) |
 
 **Modularity:** data access, function logic and auth sit behind our own modules, so the platform can change later (self-hosted Supabase, or AWS). Details come with the backend design ([database-analysis.md §6](database-analysis.md#6-proposal)).
 
@@ -466,7 +467,7 @@ flowchart LR
     S1["MVP-slice-1<br/>Log meals and bodyweight<br/>Day page"] --> S2["MVP-slice-2<br/>Weekly habit view"] --> S3["MVP-slice-3<br/>Goals, onboarding,<br/>per-log comments"] --> S4["MVP-slice-4<br/>Weekly session,<br/>commitments, supply"]
 ```
 
-- **MVP-slice-1:** single user; no accounts, no payments. Voice through the phone keyboard's dictation. Odysseas tests it personally for 2 weeks; done when at least 12 of 14 days are logged.
+- **MVP-slice-1:** single user, signed in once to an account made by hand ([why](building-log.md#decision-log)); no account features, no payments. Voice through the phone keyboard's dictation. Odysseas tests it personally for 2 weeks; done when at least 12 of 14 days are logged.
 - **MVP-slice-2:** habits, common meals, diet share, overlap and trends; usefulness comes with goals in slice 3. Done when, run on the slice-1 logs, it shows Odysseas something new.
 - **Later MVP slices:** the rest of sections 1–8, except [§10.2](#102-later), ordered when we get there.
 
@@ -496,7 +497,7 @@ flowchart LR
 - How daily diet rules (g/kg/day) judge a single meal or a habit.
 - How the app's AI recalls a user's history in a session (Odysseas's homework: agentic retrieval vs vector RAG).
 - Cost per active user per day (about 5 parses and 5 comments, plus the weekly analysis and session), before choosing models.
-- Slice-1 setup: accounts or one hard-wired user; Expo's push service or FCM; what runs on the phone and what in functions.
+- Push notifications, when reminders are built ([§3.5](#35-reminders)): Expo's push service or FCM.
 - Global meal DB: structure and meal families (p7).
 - Diet rules: references, the protein "(?)", the carb reading (p27).
 - Brain fog: an outcome (p1) and a meal danger (p2), not yet a feature.
