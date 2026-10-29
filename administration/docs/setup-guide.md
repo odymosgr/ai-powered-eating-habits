@@ -35,8 +35,8 @@ Already installed: Homebrew, git, Docker Desktop, Android Studio with Android SD
    ```
    Add `eval "$(fnm env --use-on-cd --shell zsh)"` to `~/.zshrc`, open a new terminal, then:
    ```bash
-   fnm install 24
-   fnm default 24
+   fnm install 26
+   fnm default 26
    ```
 2. Android tools on your PATH: add these three lines from the Expo docs to `~/.zshrc`.
    ```bash
@@ -54,7 +54,7 @@ Already installed: Homebrew, git, Docker Desktop, Android Studio with Android SD
 **Check**, in a new terminal:
 
 ```bash
-node -v          # v24.x
+node -v          # v26.x
 adb devices      # your phone, marked "device"
 gh auth status   # logged in to github.com
 docker info      # server details, no error
@@ -69,7 +69,7 @@ docker info      # server details, no error
 **Do**, from the repo root:
 
 ```bash
-echo 24 > .nvmrc
+echo 26 > .nvmrc
 npx create-expo-app@latest eating-habits --template default@sdk-58 --no-install --no-agents-md
 rm -f eating-habits/LICENSE
 rsync -a --ignore-existing eating-habits/ ./
