@@ -142,7 +142,7 @@ One eating occasion, made of one or more **items** (parts better logged separate
 | Field | Content |
 | --- | --- |
 | Time | Part of the day, plus the log timestamp |
-| Name | User-given. May inform a future global meal DB |
+| Name | User-given. May inform the global meal DB ([§9.5](#95-path-to-own-models)) |
 | Size | Snack: small plate or handful < Normal: large plate < Large: heavy large plate, or large with a side < XL: until the stomach can't take more |
 | Volume | Physical volume: how much the meal fills the stomach. The primary underlying metric for satiety: high satiety = high volume + low calories. Words like "filling" or "light" are combinations or wordings of the two. Protein and fiber add satiety too, so satiety will need a function of all four; research when building (grams per item may be the practical volume proxy; Rolls, *Volumetrics*; Holt et al. 1995) |
 | Nutrition | Calories, protein, fat, carbs. AI estimates, good enough for guidance |
@@ -422,7 +422,7 @@ _Decided 23–27 Oct, starting from the council review._
 | Expenditure, calorie goal, bodyweight trend | Code |
 | Diet-adherence rules, usefulness, diet share, overlap, trends | Code |
 
-Extraction doesn't depend on goals; scoring does. So changing goals, or viewing old weeks through another goal, re-runs arithmetic, not the LLM. The custom goal is the exception: judging free text needs the LLM. Scores stay explainable and unit-testable.
+Extraction doesn't depend on goals; scoring does. So changing goals, or viewing old weeks through another goal, re-runs arithmetic, not the LLM. The custom goal is the exception: judging free text needs the LLM. Scores stay explainable and unit-testable. Own models may take over some LLM jobs later ([§9.5](#95-path-to-own-models)).
 
 ### 9.2 Data rules
 
@@ -434,6 +434,7 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 | Goals, calorie goal | Version them with start dates; never overwrite | Goal-mismatched overlays, lenses and the calorie-goal history need it |
 | Units | Store kg, g, kcal; convert at display | Imperial later costs nothing |
 | Confidence | Keep stated, inferred, confirmed and rejected values apart, plus the method behind each inference (e.g. AI parse, habit trend, photo) | Trust, corrections, deleting assumptions |
+| Training use | Only logs of users who opted in train models or feed the global meal DB ([§9.5](#95-path-to-own-models)). Ask at sign-up, before the first external user logs | Logs with bodyweight are likely health data under GDPR (Art. 9); users who left can't be asked later |
 
 ### 9.3 AI engineering habits
 
@@ -456,6 +457,36 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 **Modularity:** data access, function logic and auth sit behind our own modules, so the platform can change later (self-hosted Supabase, or AWS). Details come with the backend design ([database-analysis.md §6](database-analysis.md#6-proposal)).
 
+### 9.5 Path to own models
+
+_Decided 30 Oct ([why](building-log.md#decision-log))._
+
+The LLM does every AI job first ([§9.1](#91-the-ai-extracts-code-scores)). A model or code takes a job over only when its trigger fires and it beats the LLM on that job's eval set ([§9.3](#93-ai-engineering-habits)). Only logs of users who opted in are used ([§9.2](#92-data-rules)).
+
+```mermaid
+flowchart LR
+    LOG["Log thread"] --> PARSE["Parse<br/>LLM now, own model later"]
+    PARSE --> CONF["Confirmed logs,<br/>dropped guesses, corrections"]
+    CONF -->|opted-in users| DATA["Training data"]
+    DATA -.->|trigger fires| PARSE
+    CONF --> HAB["Weekly habits<br/>LLM now, code later"]
+    HAB --> COM["Session commitments"]
+    COM --> OUT["Adherence and bodyweight"]
+    OUT -.->|enough users| SUG["Suggestions<br/>for the sessions"]
+    HAB -->|common meals| MDB["Global meal DB"]
+    PUB["Public nutrition DBs"] --> MDB
+    MDB -->|nutrition| PARSE
+```
+
+| Job | Later | Training data | Trigger |
+| --- | --- | --- | --- |
+| Parsing logs | A small fine-tuned model | Original words → confirmed items and context. Dropped guesses and restarted threads are the hard cases | Cost per active user or estimate stability misses its target |
+| Habits | Code that groups the week's meals by trigger fields (part of day, place, company, emotion), weighted by calories. It gives the same groups on every run, so it passes the stability eval | None: grouping needs no labels. The hand-made grouping checks it | First candidate, once MVP-slice-2 works. Needs fixed context categories, which a re-parse adds |
+| Session suggestions | Suggest the changes that worked for similar users. The talk stays LLM | Commitments → adherence → bodyweight | Enough users with outcomes |
+
+- **Global meal DB:** a catalog of meals and meal families (p7), built from users' common meals ([§2.2](#22-a-habit)), with nutrition from public databases: USDA FoodData Central (public domain) and Open Food Facts for packaged food. Foods are the unit and meals are combinations of them, since a fixed list of whole meals breaks on the long tail of home cooking. A meal enters only once several users have it: privacy, and it filters noise. Families also feed the session swaps "within a similar taste palette" ([§6.2](#62-weekly-session)).
+- **Other datasets:** none known matches casual spoken meal descriptions with context. Kaggle's food data, mostly images, recipes and packaged products, often scraped with unclear licenses, doesn't fit.
+
 ## 10. Scope
 
 ### 10.1 MVP slices
@@ -475,9 +506,10 @@ flowchart LR
 
 | Area | Items |
 | --- | --- |
-| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; a global meal DB; storing photos, much later: a photo history for users who like it, or backend analysis |
+| Logging | Hydration and liquid intake; workouts as day events; stomach-fullness tracking, to predict hunger and advise after heavy meals; storing photos, much later: a photo history for users who like it, or backend analysis |
 | Goals | Custom goal; keto; per-meal bodyweight usefulness; a workout-rules section on the goals page; imperial units |
 | AI dietitian | A user-chosen character; a short per-user md file defining how the AI speaks; a recipe book |
+| Own models | Parsing, habits, suggestions and the global meal DB ([§9.5](#95-path-to-own-models)) |
 | Screens | Exercise page (works like the supply page) and exercise advice; menstrual-cycle tracking and advice; hydration entry point; a brief app overview after onboarding |
 | Support | Complaint service: chat-like, with requests |
 
@@ -498,6 +530,6 @@ flowchart LR
 - How the app's AI recalls a user's history in a session (Odysseas's homework: agentic retrieval vs vector RAG).
 - Cost per active user per day (about 5 parses and 5 comments, plus the weekly analysis and session), before choosing models.
 - Push notifications, when reminders are built ([§3.5](#35-reminders)): Expo's push service or FCM.
-- Global meal DB: structure and meal families (p7).
+- Global meal DB: its schema and how meal families are defined ([§9.5](#95-path-to-own-models), p7).
 - Diet rules: references, the protein "(?)", the carb reading (p27).
 - Brain fog: an outcome (p1) and a meal danger (p2), not yet a feature.
