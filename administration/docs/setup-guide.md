@@ -12,7 +12,7 @@ Commands were checked against the official docs on 28 Oct 2026. Open each step's
 
 - [x] [0. Tools on your Mac](#0-tools-on-your-mac)
 - [x] [1. The Expo app, inside the repo](#1-the-expo-app-inside-the-repo)
-- [ ] [2. The app on your phone](#2-the-app-on-your-phone)
+- [x] [2. The app on your phone](#2-the-app-on-your-phone)
 - [ ] [3. First screen, the Obytes way](#3-first-screen-the-obytes-way)
 - [ ] [4. One command checks everything](#4-one-command-checks-everything)
 - [ ] [5. Supabase on your Mac](#5-supabase-on-your-mac)
