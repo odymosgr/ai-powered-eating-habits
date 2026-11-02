@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 
 export function DayScreen() {
-  const currentDate = new Date().toLocaleDateString()
+  const currentDate = new Date().toLocaleDateString();
 
   return (
     <View>

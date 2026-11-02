@@ -1,1 +1,1 @@
-export { DayScreen as default } from '@/features/day/day-screen';
+export { DayScreen as default } from "@/features/day/day-screen";
