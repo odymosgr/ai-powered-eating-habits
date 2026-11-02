@@ -1,7 +1,7 @@
 # AI-Powered Eating Habits — Product Plan
 
 **Version 5, 27 Oct 2026.** Built from the [paper notes](initial-notes/initial-notes.md) (6–26 Oct), the 7 Oct plan and the council review (closed 27 Oct, kept in git history). Where ideas changed, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
-Database analysis and backend design input: [database-analysis.md](database-analysis.md). Decisions over time: [building-log.md](building-log.md#decision-log).
+Database analysis and backend design input: [database-analysis.md](database-analysis.md). Decisions over time: [decision log](../../README.md#decision-log).
 
 ## Contents
 
@@ -449,8 +449,8 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 | Part | Decision |
 | --- | --- |
-| Client | React Native + Expo, locked 27 Oct ([why](building-log.md#decision-log)) |
-| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](building-log.md#decision-log); [analysis](database-analysis.md)) |
+| Client | React Native + Expo, locked 27 Oct ([why](../../README.md#decision-log)) |
+| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](../../README.md#decision-log); [analysis](database-analysis.md)) |
 | LLM | Provider-agnostic, so each job can compare models from different providers. Vercel AI SDK + promptfoo for now; details when building |
 | Connectivity | Online only: offline-first costs too much for a first app |
 | Codebase | One Expo project with Supabase inside, laid out so agents can work in parallel, decided 28 Oct ([layout](tech-stack.md#4-folders)) |
@@ -459,7 +459,7 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 ### 9.5 Path to own models
 
-_Decided 30 Oct ([why](building-log.md#decision-log))._
+_Decided 30 Oct._
 
 The LLM does every AI job first ([§9.1](#91-the-ai-extracts-code-scores)). A model or code takes a job over only when its trigger fires and it beats the LLM on that job's eval set ([§9.3](#93-ai-engineering-habits)). Only logs of users who opted in are used ([§9.2](#92-data-rules)).
 
@@ -498,7 +498,7 @@ flowchart LR
     S1["MVP-slice-1<br/>Log meals and bodyweight<br/>Day page"] --> S2["MVP-slice-2<br/>Weekly habit view"] --> S3["MVP-slice-3<br/>Goals, onboarding,<br/>per-log comments"] --> S4["MVP-slice-4<br/>Weekly session,<br/>commitments, supply"]
 ```
 
-- **MVP-slice-1:** single user, signed in once to an account made by hand ([why](building-log.md#decision-log)); no account features, no payments. Voice through the phone keyboard's dictation. Odysseas tests it personally for 2 weeks; done when at least 12 of 14 days are logged.
+- **MVP-slice-1:** single user, signed in once to an account made by hand; no account features, no payments. Voice through the phone keyboard's dictation. Odysseas tests it personally for 2 weeks; done when at least 12 of 14 days are logged.
 - **MVP-slice-2:** habits, common meals, diet share, overlap and trends; usefulness comes with goals in slice 3. Done when, run on the slice-1 logs, it shows Odysseas something new.
 - **Later MVP slices:** the rest of sections 1–8, except [§10.2](#102-later), ordered when we get there.
 

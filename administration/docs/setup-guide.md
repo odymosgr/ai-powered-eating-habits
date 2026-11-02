@@ -390,7 +390,7 @@ If `tsc` fails in CI on missing Expo types, generate them first with `npx expo c
 
 ## After setup
 
-- **Feature work starts by grilling the log thread.** GitHub Issues log its tickets ([decision log](building-log.md#decision-log)).
+- **Feature work starts by grilling the log thread.** GitHub Issues log its tickets.
 - **The 2-week test needs a release build:** one that runs without your Mac, against the cloud project. It's a ticket near the end of slice 1.
 
 [expo-env]: https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=physical&mode=development-build&buildEnv=local
