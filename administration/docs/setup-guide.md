@@ -151,24 +151,25 @@ npx expo install prettier eslint-config-prettier eslint-plugin-prettier --dev
 npx expo install jest-expo jest @types/jest @testing-library/react-native --dev
 ```
 
-- `expo lint` installs ESLint and writes `eslint.config.js`. Add Prettier to it as the ESLint docs show.
+- `expo lint` installs ESLint and writes `eslint.config.js`. Add Prettier to it as the ESLint docs show, and add `expo-env.d.ts` to its `ignores`: Expo generates that file, and it fails Prettier.
+- In `tsconfig.json`, add `"types": ["jest"]` to `compilerOptions`: TypeScript 6 no longer loads installed types by itself.
 - In `package.json`, add `"jest": { "preset": "jest-expo" }` and these scripts:
   ```json
-  "type-check": "tsc --noEmit",
   "test": "jest",
-  "check": "npm run type-check && npm run lint && npm run test"
+  "check": "tsc --noEmit && npm run lint && npm test"
   ```
 - Write `src/features/day/day-screen.test.tsx`. It renders `DayScreen` and finds "Today".
 - `tsc` needs `expo-env.d.ts`, which the dev server writes. You've run the dev server since step 2.
+- In VS Code, install the ESLint extension. With `.vscode/settings.json`, Cmd+S then applies its fixes.
 
-**Borrow:** from Obytes, [the scripts in `package.json`][obytes-package] (`type-check`, `check-all`) and [a test beside its component][obytes-test].
+**Borrow:** from Obytes, [its `check-all` script][obytes-package] and [a test beside its component][obytes-test].
 
 **Check**
 
 - `npm run check` passes.
 - Break it three ways, one at a time:
   1. A type error, such as `const n: number = 'a'`.
-  2. Messy formatting.
+  2. Messy formatting, saved with Save without Formatting (Cmd+K S), since Cmd+S fixes it.
   3. A wrong expected text in the test.
 
   Each one makes `npm run check` fail with a message pointing at the line. Undo each, and it passes again. `npx expo lint --fix` fixes formatting for you.
@@ -375,7 +376,7 @@ npx supabase functions serve parse-log
   4. `npx supabase db start`;
   5. `npm run test:db`.
 
-If `type-check` fails in CI on missing Expo types, generate them first with `npx expo customize tsconfig.json` ([TypeScript docs](https://docs.expo.dev/guides/typescript/)).
+If `tsc` fails in CI on missing Expo types, generate them first with `npx expo customize tsconfig.json` ([TypeScript docs](https://docs.expo.dev/guides/typescript/)).
 
 **Borrow:**
 
