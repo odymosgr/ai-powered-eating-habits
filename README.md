@@ -11,7 +11,7 @@ What I did, week by week. Start date: 6 Oct 2026.
 - **Weeks 1–2:** put all my ideas on paper to get a complete view of the project, even a basic homepage design. Transcribed them with Claude into a product plan.
 - **Week 3:** rest, and review of the product plan details.
 - **Week 4:** continued with long-term decisions, made the Weight Room wireframes and the voice-to-meal-logging flow. Also initialized react-native setup.
-- **Week 5:** Learned react-native basics. ESLint, Prettier & Jest.
+- **Week 5:** Learned react-native basics. ESLint, Prettier & Jest. Personal artistic preparations.
 
 ## Decision Log
 
