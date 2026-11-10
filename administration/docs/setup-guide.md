@@ -15,7 +15,7 @@ Commands were checked against the official docs on 28 Oct 2026. Open each step's
 - [x] [2. The app on your phone](#2-the-app-on-your-phone)
 - [x] [3. First screen, the Obytes way](#3-first-screen-the-obytes-way)
 - [x] [4. One command checks everything](#4-one-command-checks-everything)
-- [ ] [5. Supabase on your Mac](#5-supabase-on-your-mac)
+- [x] [5. Supabase on your Mac](#5-supabase-on-your-mac)
 - [ ] [6. First table, locked down and tested](#6-first-table-locked-down-and-tested)
 - [ ] [7. The phone signs in](#7-the-phone-signs-in)
 - [ ] [8. Tracer bullet: log your weight](#8-tracer-bullet-log-your-weight)
