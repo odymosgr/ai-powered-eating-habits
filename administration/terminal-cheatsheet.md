@@ -13,14 +13,15 @@ Oct 2026
   - `pair <ip>:<port>`
 - `npx` Node Package eXecute
   - `expo start`
-  - `supabase start`: starts the local stack in Docker
-  - `supabase status`: its URLs and keys
-  - `supabase stop`: stops it, keeps the data
+  - `supabase`
+    - `status`
+    - `stop`
+    - `start`
 - `npm` Node Package Manager
   - `run check`: type check, then lint, then tests
   - `run lint`
   - `test`: all tests
   - `test -- day-screen`: only the test files whose name matches
-- `docker` (Docker Desktop must be running)
-  - `info`: is the engine running?
+- `docker`
+  - `info`
   - `ps`: the running containers
