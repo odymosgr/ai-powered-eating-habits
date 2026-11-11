@@ -224,7 +224,7 @@ npx supabase test new bodyweights_rls.test
   - you see and add your own rows;
   - a second user sees none of them and can't change them;
   - a signed-out request gets nothing.
-- **Folder rules:** write the database rules in `supabase/AGENTS.md`, beside a `supabase/CLAUDE.md` holding `@AGENTS.md` ([tech-stack.md §5](tech-stack.md#5-working-with-agents)).
+- **Database rules:** in `supabase/AGENTS.md`, linked from the root `AGENTS.md` ([tech-stack.md §5](tech-stack.md#5-working-with-agents)).
 - **Script:** add `"test:db": "supabase test db"` to `package.json`.
 
 Then rebuild the local database from the migrations and run the test:
