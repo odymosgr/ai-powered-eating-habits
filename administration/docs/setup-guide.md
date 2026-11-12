@@ -16,7 +16,7 @@ Commands were checked against the official docs on 28 Oct 2026. Open each step's
 - [x] [3. First screen, the Obytes way](#3-first-screen-the-obytes-way)
 - [x] [4. One command checks everything](#4-one-command-checks-everything)
 - [x] [5. Supabase on your Mac](#5-supabase-on-your-mac)
-- [ ] [6. First table, locked down and tested](#6-first-table-locked-down-and-tested)
+- [x] [6. First table, locked down and tested](#6-first-table-locked-down-and-tested)
 - [ ] [7. The phone signs in](#7-the-phone-signs-in)
 - [ ] [8. Tracer bullet: log your weight](#8-tracer-bullet-log-your-weight)
 - [ ] [9. First Edge Function](#9-first-edge-function)
@@ -208,14 +208,17 @@ The `bodyweights` table: the simplest slice-1 table, and the pattern every table
 
 **Do**
 
+Build the table in Studio (http://127.0.0.1:54323), then save it as a migration and create the test file:
+
 ```bash
-npx supabase migration new create_bodyweights
-npx supabase test new bodyweights_rls.test
+npx supabase db pull create_bodyweights
+npx supabase test new bodyweights_rls
 ```
 
-- **The migration** follows the guardrails that apply here ([database-analysis.md §6](database-analysis.md#6-proposal), 3 and 10–11):
-  - `user_id` on every row, and first in its index;
-  - explicit grants to `authenticated`;
+- **The table** follows the guardrails that apply here ([database-analysis.md §6](database-analysis.md#6-proposal), 3 and 10–11):
+  - `user_id` on every row, first in the primary key `(user_id, id)` and in every index;
+  - IDs made by the app, so `id` has no default;
+  - grants to `authenticated` only;
   - RLS, with one policy per action;
   - a range check on the weight.
 
@@ -234,16 +237,13 @@ npx supabase db reset
 npm run test:db
 ```
 
-**Borrow:**
-
-- the two-user RLS test in Supabase's [testing overview][sb-testing];
-- the shape of a policy from the Supabase example's [migration][sb-sql].
+**Borrow:** nothing. The Supabase skills in `.claude/skills/` hold the patterns.
 
 **Check**
 
 - Studio shows the table, with RLS enabled.
 - `npm run test:db` reports all tests successful.
-- Remove the select policy, then run `db reset` and the test again: the test fails. Restore the policy.
+- In Studio, delete the select policy and run the test again: it fails. `npx supabase db reset` restores the policy from the migration.
 
 ## 7. The phone signs in
 
@@ -397,7 +397,6 @@ If `tsc` fails in CI on missing Expo types, generate them first with `npx expo c
 [sb-quickstart]: https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native
 [sb-testing]: https://supabase.com/docs/guides/local-development/testing/overview
 [sb-auth]: https://github.com/supabase/supabase/blob/2a8dc75e3d89f590cdc427a1f65273c910508575/examples/user-management/expo-user-management/components/Auth.tsx
-[sb-sql]: https://github.com/supabase/supabase/blob/2a8dc75e3d89f590cdc427a1f65273c910508575/examples/user-management/expo-user-management/supabase/migrations/20240403090422_init.sql
 [obytes-route]: https://github.com/obytes/react-native-template-obytes/blob/fd9b358ed11913d2a49fd9ffa6582fe03ba130e7/src/app/feed/%5Bid%5D.tsx
 [obytes-feed]: https://github.com/obytes/react-native-template-obytes/tree/fd9b358ed11913d2a49fd9ffa6582fe03ba130e7/src/features/feed
 [obytes-package]: https://github.com/obytes/react-native-template-obytes/blob/fd9b358ed11913d2a49fd9ffa6582fe03ba130e7/package.json
