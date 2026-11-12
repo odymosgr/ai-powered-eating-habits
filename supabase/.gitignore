@@ -2,6 +2,9 @@
 .branches
 .temp
 
+# Studio's saved queries
+/snippets/
+
 # dotenvx
 .env.keys
 .env.local
