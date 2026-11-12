@@ -17,11 +17,15 @@ Oct 2026
     - `status`
     - `stop`
     - `start`
+    - `db pull <name>`: save Studio's changes as a migration
+    - `db reset`: rebuild the database from the migrations (wipes the data)
+    - `test new <name>`: a new test file in `supabase/tests/`
 - `npm` Node Package Manager
-  - `run check`: type check, then lint, then tests
+  - `run check`: type check, then lint, then the app's tests
   - `run lint`
-  - `test`: all tests
-  - `test -- day-screen`: only the test files whose name matches
+  - `test`: the app's tests (Jest)
+  - `test -- day-screen`: only the app's test files whose name matches
+  - `run test:db`: the database tests (pgTAP)
 - `docker`
   - `info`
   - `ps`: the running containers
