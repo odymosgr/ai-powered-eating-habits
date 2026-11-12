@@ -49,6 +49,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest",
+    "test:db": "supabase test db",
     "check": "tsc --noEmit && npm run lint && npm test"
   },
   "jest": {
