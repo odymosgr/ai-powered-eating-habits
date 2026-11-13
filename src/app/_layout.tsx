@@ -20,7 +20,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ title: "Today" }} />
       </Stack.Protected>
       <Stack.Protected guard={!isSignedIn}>
-        <Stack.Screen name="sign-in" options={{ title: "Sign in" }} />
+        <Stack.Screen name="sign-in" options={{ headerShown: false }} />
       </Stack.Protected>
     </Stack>
   );
