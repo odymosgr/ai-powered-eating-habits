@@ -17,7 +17,7 @@ Commands were checked against the official docs on 28 Oct 2026. Open each step's
 - [x] [4. One command checks everything](#4-one-command-checks-everything)
 - [x] [5. Supabase on your Mac](#5-supabase-on-your-mac)
 - [x] [6. First table, locked down and tested](#6-first-table-locked-down-and-tested)
-- [ ] [7. The phone signs in](#7-the-phone-signs-in)
+- [x] [7. The phone signs in](#7-the-phone-signs-in)
 - [ ] [8. Tracer bullet: log your weight](#8-tracer-bullet-log-your-weight)
 - [ ] [9. First Edge Function](#9-first-edge-function)
 - [ ] [10. The cloud project](#10-the-cloud-project)
@@ -255,12 +255,13 @@ npx expo run:android --device
 ```
 
 - **Rebuild:** `expo-sqlite`, which stores the session, has native code, so the app is rebuilt once.
+- **`expo-sqlite` stays pinned at 58.0.10:** from 58.0.11 on, its Android module uses Expo Modules v2, and our development build crashed with "Cannot find native module 'ExpoSQLite'". `expo.install.exclude` in `package.json` stops `npx expo install --fix` from upgrading it. Retry newer versions at the next SDK upgrade.
 - **`.env.local`** (git ignores it) gets the values from `npx supabase status`:
   ```bash
-  EXPO_PUBLIC_SUPABASE_URL=http://<your Mac's IP>:54321
+  EXPO_PUBLIC_SUPABASE_URL=http://localhost:54321
   EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
   ```
-  - Use the Mac's IP, not `127.0.0.1`: on the phone, `127.0.0.1` is the phone itself. `ipconfig getifaddr en0` prints the Mac's IP.
+  - On the phone, `localhost` is the phone itself, and the Mac's IP changes. So in development, `src/lib/supabase.ts` swaps `localhost` for the address of the Mac that runs Metro.
   - Restart `npx expo start` after editing the file.
 - **`src/lib/supabase.ts`:** the quickstart's client, the only place one is created. Enforce it with a lint rule (`no-restricted-imports`): only `src/lib/` may import `@supabase/supabase-js`.
 - **`src/lib/auth.ts`:** sign in, sign out, and the current session.
