@@ -7,6 +7,7 @@ export function DayScreen() {
     <View>
       <Text>Today is:</Text>
       <Text>{currentDate}</Text>
+      <Text>You will never be younger, you have never been older</Text>
     </View>
   );
 }
