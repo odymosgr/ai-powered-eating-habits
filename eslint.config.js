@@ -9,4 +9,21 @@ module.exports = defineConfig([
   {
     ignores: ["dist/*", "expo-env.d.ts"],
   },
+  {
+    // Only src/lib/ talks to Supabase (tech-stack.md §5)
+    ignores: ["src/lib/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@supabase/supabase-js",
+              message: "Import from @/lib instead: only src/lib/ talks to Supabase.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
