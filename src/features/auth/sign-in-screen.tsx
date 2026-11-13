@@ -36,7 +36,6 @@ export function SignInScreen() {
       accessible={false}
     >
       <StatusBar style="dark" />
-      {/* Adds padding at the bottom while the keyboard is open, so it never covers the form. */}
       <KeyboardAvoidingView style={styles.form} behavior="padding">
         <Text style={styles.title}>Welcome back</Text>
         <Text style={styles.subtitle}>Sign in with your email</Text>
@@ -87,7 +86,6 @@ export function SignInScreen() {
   );
 }
 
-// Fixed colors, so the phone's dark mode can't turn the text light on this white screen.
 const colors = {
   background: "#ffffff",
   text: "#111111",
