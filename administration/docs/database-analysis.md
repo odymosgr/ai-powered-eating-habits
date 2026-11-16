@@ -228,7 +228,7 @@ Weights are for a solo, pre-MVP builder, after cross-checking the four reports a
 
 1. The riskiest writes come from the LLM and from coding agents, and only Postgres checks every write, the server's included.
 2. The core analysis, habits ↔ meals and versions over weeks, is relational by nature, and its mistakes should fail loudly, not silently.
-3. Agents can verify their own work against a typed schema, local tests and advisors: poteto's trust through verification.
+3. Agents can verify their own work against a typed schema, local tests and advisors.
 4. The database is the hardest choice to reverse, and Postgres keeps it reversible.
 5. The same model reaches planetary scale by sharding on user ID, while keeping its checks and cost control ([§7](#7-at-planetary-scale)).
 
