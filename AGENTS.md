@@ -28,6 +28,11 @@
 - Include a short section like a table of contents at the top if the md is hard to skim for a human
 - Before finishing a doc, re-read it once to check it against these rules
 
+## Matt Pocock's skills
+
+- We build features with them. What each skill is for, and our house rules: [skills.md](administration/council/software-architect/matt-pococks-guidance/skills.md)
+- While his skills run, they decide when and how to commit (`/implement` commits to the current branch). The Git commits rules below cover all other work
+
 ## Git commits
 
 - One commit per logical change. Each file belongs to exactly one commit
