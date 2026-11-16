@@ -19,8 +19,8 @@ Commands were checked against the official docs on 28 Oct 2026. Open each step's
 - [x] [6. First table, locked down and tested](#6-first-table-locked-down-and-tested)
 - [x] [7. The phone signs in](#7-the-phone-signs-in)
 - [ ] [8. Tracer bullet: log your weight](#8-tracer-bullet-log-your-weight)
-- [ ] [9. First Edge Function](#9-first-edge-function)
-- [ ] [10. The cloud project](#10-the-cloud-project)
+- [ ] [9. First Edge Function](#9-first-edge-function), with the log thread
+- [ ] [10. The cloud project](#10-the-cloud-project), with the log thread
 - [ ] [11. CI on GitHub](#11-ci-on-github)
 
 ## 0. Tools on your Mac
@@ -306,6 +306,7 @@ npx supabase gen types typescript --local > src/lib/data/database.types.ts
 - **`src/features/bodyweight/`:**
   - its hooks, in `api.ts`;
   - a bare screen: a number field, a Save button and today's entries.
+- **Today's date, read outside render:** the React Compiler (on in `app.json`) caches what a render computes, so a `new Date()` there freezes until the app restarts. Keep today in state that updates when the app returns to the foreground, and give `DayScreen` the same fix.
 
 **Borrow:** two Obytes files:
 
@@ -317,6 +318,7 @@ npx supabase gen types typescript --local > src/lib/data/database.types.ts
 - Save 80.5: it shows in the list, and in Studio with your user ID.
 - Save 5000: the database refuses it, and the screen says so.
 - In airplane mode, Save fails visibly. The app is online-only ([plan §9.4](product-plan.md#94-stack)).
+- Change the phone's date in Settings, then return to the app: the day screen and today's entries follow the new date.
 
 **Docs:** [Generating types](https://supabase.com/docs/guides/api/rest/generating-types) · [TanStack Query in React Native](https://tanstack.com/query/latest/docs/framework/react/react-native)
 
@@ -391,7 +393,9 @@ If `tsc` fails in CI on missing Expo types, generate them first with `npx expo c
 
 ## After setup
 
-- **Feature work starts by grilling the log thread.** GitHub Issues log its tickets.
+- **Features are built with [Matt Pocock's skills](../council/software-architect/matt-pococks-guidance/skills.md).** Steps 8 and 11 come first.
+- **First, the bodyweight feature:** one entry per day and the edit window ([plan §3.1](product-plan.md#31-bodyweight)). It fits one session: `/grill-with-docs`, `/implement`, a pull request, `/retro`.
+- **Then the log thread**, with the full flow: `/to-spec` and `/to-tickets` put its tickets in GitHub Issues. Its parser is the first Edge Function, so steps 9 and 10 happen inside it.
 - **The 2-week test needs a release build:** one that runs without your Mac, against the cloud project. It's a ticket near the end of slice 1.
 
 [expo-env]: https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=physical&mode=development-build&buildEnv=local
