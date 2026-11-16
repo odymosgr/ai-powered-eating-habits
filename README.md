@@ -13,6 +13,7 @@ What I did, week by week. Start date: 6 Oct 2026.
 - **Week 4:** continued with long-term decisions, made the Weight Room wireframes and the voice-to-meal-logging flow. Also initialized react-native setup.
 - **Week 5:** Learned react-native basics. ESLint, Prettier & Jest. Personal artistic preparations.
 - **Week 6:** Supabase w/ Docker setup. More learning react-native & supabase. Basic sign-in screen.
+- **Week 7:** Matt Pocock's Skills: Introduction, Set-Up
 
 ## Decision Log
 
