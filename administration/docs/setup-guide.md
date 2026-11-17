@@ -215,7 +215,7 @@ npx supabase db pull create_bodyweights
 npx supabase test new bodyweights_rls
 ```
 
-- **The table** follows the guardrails that apply here ([database-analysis.md §6](database-analysis.md#6-proposal), 3 and 10–11):
+- **The table** follows the database rules that apply here ([supabase/AGENTS.md](../../supabase/AGENTS.md)):
   - `user_id` on every row, first in the primary key `(user_id, id)` and in every index;
   - IDs made by the app, so `id` has no default;
   - grants to `authenticated` only;
@@ -331,7 +331,7 @@ npx supabase functions new parse-log
 npx supabase functions serve parse-log
 ```
 
-- **Thin wrapper:** `index.ts` only wraps a plain module beside it (guardrail 13). For now, the module echoes back the words it receives.
+- **Thin wrapper:** `index.ts` only wraps a plain module beside it ([tech-stack.md §4](tech-stack.md#4-folders)). For now, the module echoes back the words it receives.
 - **The risk from [tech-stack.md §4](tech-stack.md#4-folders):** import a type from `src/shared/` into that module. If the import fails here or at deploy (step 10), move `src/shared/` to `supabase/functions/_shared/`.
 
 **Check**
@@ -377,7 +377,8 @@ npx supabase functions serve parse-log
   2. set up Node the same way;
   3. `npm ci`;
   4. `npx supabase db start`;
-  5. `npm run test:db`.
+  5. `npm run test:db`;
+  6. `npx supabase db advisors`.
 
 If `tsc` fails in CI on missing Expo types, generate them first with `npx expo customize tsconfig.json` ([TypeScript docs](https://docs.expo.dev/guides/typescript/)).
 

@@ -17,8 +17,11 @@ What I did, week by week. Start date: 6 Oct 2026.
 
 ## Decision Log
 
-- **27 Oct 2026:** Chose React Native + Expo as the client technology: well documented and long-lived, strong for agentic development (coding agents write TypeScript and React best), one codebase for iOS and Android, and Expo's tooling makes testing on a real phone easy.
-- **27 Oct 2026:** Chose a relational database, Postgres, hosted on Supabase. Relational for data cohesion, and it scales to planetary size by sharding on user ID. Supabase because it's open source and self-hostable, so moving to our own servers or to AWS later stays possible.
+Copied from [docs/adr/](docs/adr/), the source of truth.
+
+- **27 Oct 2026, [React Native and Expo for the client](docs/adr/0001-react-native-and-expo.md):** We build the app with React Native and Expo, so one TypeScript codebase serves both iOS and Android. Both are well documented and long-lived, coding agents write TypeScript and React best, and Expo's tooling makes testing on a real phone easy.
+- **27 Oct 2026, [Postgres on Supabase](docs/adr/0002-postgres-on-supabase.md):** Our data lives in Postgres, a relational database hosted on Supabase, instead of a document store like Firebase's Firestore. Postgres checks every write, which matters when an LLM and coding agents make the riskiest writes, and it reaches planetary scale by sharding on user ID, since no daily query reads across users. Supabase is open source and self-hostable, so moving to our own servers or to AWS later stays possible. We'd reconsider if offline logging became a hard requirement.
+- **27 Oct 2026, [Online only](docs/adr/0003-online-only.md):** The app needs a connection to work: offline-first, where the phone keeps its own copy of the data and syncs it later, costs too much for a first app. A small outbox on the phone still retries a log sent on bad signal, so nothing is lost.
 
 
 Copyright © 2026 Odysseas Moschidis. All rights reserved.

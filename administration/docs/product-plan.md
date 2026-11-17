@@ -1,7 +1,7 @@
 # AI-Powered Eating Habits — Product Plan
 
 **Version 5, 27 Oct 2026.** Built from the [paper notes](initial-notes/initial-notes.md) (6–26 Oct), the 7 Oct plan and the council review (closed 27 Oct, kept in git history). Where ideas changed, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
-Database analysis and backend design input: [database-analysis.md](database-analysis.md). Decisions over time: [decision log](../../README.md#decision-log).
+Architecture decisions: [docs/adr/](../../docs/adr/).
 
 ## Contents
 
@@ -430,6 +430,9 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 | --- | --- | --- |
 | Raw input | Keep the user's original words (text or transcript) and each photo's AI description. Don't keep raw audio or photos after processing | Re-parse old logs with better prompts or models; privacy; storage |
 | AI outputs | Tag each with its prompt and model version | Know what to recompute; compare versions |
+| Parsing | Every log thread has a parse status. The parse function replies at once, and a sweeper or queue retries failures. Parse versions sit side by side, with an active flag | A failed LLM call loses nothing; a new parse never overwrites the old one |
+| Sending | A small outbox on the phone, with IDs made on the phone | A log sent on bad signal is retried, never lost or duplicated |
+| Bulk jobs | Re-parses and evals run as local scripts | Edge Functions have time limits |
 | Time | Store when eaten as a UTC instant + IANA timezone, flagged as approximate when it comes from a part-of-day label; store when logged separately. Derive the day, week and part of day | End-of-day logging, travel, daylight saving |
 | Goals, calorie goal | Version them with start dates; never overwrite | Goal-mismatched overlays, lenses and the calorie-goal history need it |
 | Units | Store kg, g, kcal; convert at display | Imperial later costs nothing |
@@ -449,13 +452,13 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 | Part | Decision |
 | --- | --- |
-| Client | React Native + Expo, locked 27 Oct ([why](../../README.md#decision-log)) |
-| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](../../README.md#decision-log); [analysis](database-analysis.md)) |
+| Client | React Native + Expo, locked 27 Oct ([why](../../docs/adr/0001-react-native-and-expo.md)) |
+| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](../../docs/adr/0002-postgres-on-supabase.md)) |
 | LLM | Provider-agnostic, so each job can compare models from different providers. Vercel AI SDK + promptfoo for now; details when building |
-| Connectivity | Online only: offline-first costs too much for a first app |
+| Connectivity | Online only, decided 27 Oct ([why](../../docs/adr/0003-online-only.md)) |
 | Codebase | One Expo project with Supabase inside, laid out so agents can work in parallel, decided 28 Oct ([layout](tech-stack.md#4-folders)) |
 
-**Modularity:** data access, function logic and auth sit behind our own modules, so the platform can change later (self-hosted Supabase, or AWS). Details come with the backend design ([database-analysis.md §6](database-analysis.md#6-proposal)).
+**Modularity:** data access, function logic and auth sit behind our own modules, so the platform can change later (self-hosted Supabase, or AWS). Where they live: [tech-stack.md §4](tech-stack.md#4-folders).
 
 ### 9.5 Path to own models
 
