@@ -24,14 +24,18 @@
 - Reading docs is slow and costly for me, and I must understand all of them: keep docs few, holding only the important parts
 - Write the shortest version that preserves all distinct ideas
 - State each idea once. Reference its original section instead of repeating it
+- One deliberate copy: the README's Decision Log repeats each ADR in `docs/adr/` (date, title linked to the ADR, then its text), so repo visitors see the decisions. `docs/adr/` is the source of truth: when an ADR is added or changed, update its copy in the same change
 - When organizing random thoughts or braindumps use logical groupings for easier human understanding
 - Include a short section like a table of contents at the top if the md is hard to skim for a human
 - Before finishing a doc, re-read it once to check it against these rules
 
 ## Matt Pocock's skills
 
-- We build features with them. What each skill is for, and our house rules: [skills.md](administration/council/software-architect/matt-pococks-guidance/skills.md)
+- We build features with them. What each skill is for, and our house rules: [skills.md](administration/council/software-architect/matt-pococks-guidance/skills.md). Read the house rules before running a skill: they take precedence over it
 - While his skills run, they decide when and how to commit (`/implement` commits to the current branch). The Git commits rules below cover all other work
+- Issue tracker: GitHub Issues, through the `gh` CLI. See [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md)
+- Triage labels: Matt's five defaults. See [docs/agents/triage-labels.md](docs/agents/triage-labels.md)
+- Domain docs: single-context, one `GLOSSARY.md` and `docs/adr/` at the repo root. See [docs/agents/domain.md](docs/agents/domain.md)
 
 ## Git commits
 
@@ -53,6 +57,10 @@
 - When I write code myself to learn something new (e.g. React), teach me only the theory the task needs, let me write it, then review it for understanding, not polish
 - Start every reply with a `# <Persona> - _speaking:_` heading, e.g. `# Software Architect - _speaking:_`. If other personas contributed, add a `_consulted:_ **<Persona>**, **<Persona>**` line below it
 - A task may spawn subagents with the personas it needs, e.g. for research
+
+## Code
+
+- Before writing or reviewing code, read [tech-stack.md §4–5](administration/docs/tech-stack.md#4-folders), our coding standards
 
 ## Database
 
