@@ -80,7 +80,7 @@ npm run reset-project
 
 - `--template default@sdk-58`: `@latest` alone still makes an SDK 57 app, until Expo Go supports SDK 58.
 - `--no-agents-md`: skips Expo's agent files. We keep our own `AGENTS.md`.
-- `rm -f eating-habits/LICENSE`: that file is the template's open-source licence. This repo is all rights reserved ([README](../../README.md)).
+- `rm -f eating-habits/LICENSE`: that file is the template's open-source licence. This repo is all rights reserved ([README](../README.md)).
 - `--ignore-existing`: keeps our `README.md`.
 - `reset-project`: answer **n**, so the example app is deleted. It stays readable in [Expo's repo](https://github.com/expo/expo/tree/sdk-58/templates/expo-template-default). Then delete the `reset-project` line from `package.json`.
 
@@ -88,7 +88,7 @@ npm run reset-project
 
 **Check**
 
-- `git status` lists new files (`src/`, `app.json`, `package.json`, `.gitignore`…). `README.md`, `AGENTS.md` and `administration/` are unchanged.
+- `git status` lists new files (`src/`, `app.json`, `package.json`, `.gitignore`…). `README.md`, `AGENTS.md` and `docs/` are unchanged.
 - `npx expo-doctor` passes all its checks.
 
 **Docs:** [Expo: create a project](https://docs.expo.dev/get-started/create-a-project/)
@@ -215,7 +215,7 @@ npx supabase db pull create_bodyweights
 npx supabase test new bodyweights_rls
 ```
 
-- **The table** follows the database rules that apply here ([supabase/AGENTS.md](../../supabase/AGENTS.md)):
+- **The table** follows the database rules that apply here ([supabase/AGENTS.md](../supabase/AGENTS.md)):
   - `user_id` on every row, first in the primary key `(user_id, id)` and in every index;
   - IDs made by the app, so `id` has no default;
   - grants to `authenticated` only;
@@ -394,7 +394,7 @@ If `tsc` fails in CI on missing Expo types, generate them first with `npx expo c
 
 ## After setup
 
-- **Features are built with [Matt Pocock's skills](../council/software-architect/matt-pococks-guidance/skills.md).** Steps 8 and 11 come first.
+- **Features are built with [Matt Pocock's skills](council/software-architect/matt-pococks-guidance/skills.md).** Steps 8 and 11 come first.
 - **First, the bodyweight feature:** one entry per day and the edit window ([plan §3.1](product-plan.md#31-bodyweight)). It fits one session: `/grill-with-docs`, `/implement`, a pull request, `/retro`.
 - **Then the log thread**, with the full flow: `/to-spec` and `/to-tickets` put its tickets in GitHub Issues. Its parser is the first Edge Function, so steps 9 and 10 happen inside it.
 - **The 2-week test needs a release build:** one that runs without your Mac, against the cloud project. It's a ticket near the end of slice 1.

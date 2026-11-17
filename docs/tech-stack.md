@@ -1,6 +1,6 @@
 # Tech Stack and Codebase
 
-**28 Oct 2026.** How the app's technologies fit together, where our code lives, and how agents work on it in parallel. Facts checked against the official docs on 27–28 Oct 2026. Stack decisions: [plan §9.4](product-plan.md#94-stack). Backend rules: [supabase/AGENTS.md](../../supabase/AGENTS.md). Sections 4–5 are our coding standards: agents follow them, and `code-review` checks diffs against them.
+**28 Oct 2026.** How the app's technologies fit together, where our code lives, and how agents work on it in parallel. Facts checked against the official docs on 27–28 Oct 2026. Stack decisions: [plan §9.4](product-plan.md#94-stack). Backend rules: [supabase/AGENTS.md](../supabase/AGENTS.md). Sections 4–5 are our coding standards: agents follow them, and `code-review` checks diffs against them.
 
 ## Contents
 
@@ -36,7 +36,7 @@ flowchart LR
 - **Supabase:** a hosted Postgres with services around it: an HTTP API generated from our tables, sign-in, live updates, and Edge Functions, where our server code runs.
 - **LLM:** called only from an Edge Function. Its API key costs money per call, and anything shipped in the app can be extracted.
 - **The AI extracts, code scores** ([plan §9.1](product-plan.md#91-the-ai-extracts-code-scores)): the LLM turns words into data; our code computes totals and scores.
-- **Exit seams:** our code reaches Supabase only through our own modules, so the platform stays replaceable ([why](../../docs/adr/0002-postgres-on-supabase.md)).
+- **Exit seams:** our code reaches Supabase only through our own modules, so the platform stays replaceable ([why](adr/0002-postgres-on-supabase.md)).
 
 ## 2. One meal log's journey
 

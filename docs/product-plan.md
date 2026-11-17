@@ -1,7 +1,7 @@
 # AI-Powered Eating Habits — Product Plan
 
 **Version 5, 27 Oct 2026.** Built from the [paper notes](initial-notes/initial-notes.md) (6–26 Oct), the 7 Oct plan and the council review (closed 27 Oct, kept in git history). Where ideas changed, the latest version wins; the notes keep the history. `p26` = page 26 of the notes.
-Architecture decisions: [docs/adr/](../../docs/adr/).
+Architecture decisions: [docs/adr/](adr/).
 
 ## Contents
 
@@ -452,10 +452,10 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 | Part | Decision |
 | --- | --- |
-| Client | React Native + Expo, locked 27 Oct ([why](../../docs/adr/0001-react-native-and-expo.md)) |
-| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](../../docs/adr/0002-postgres-on-supabase.md)) |
+| Client | React Native + Expo, locked 27 Oct ([why](adr/0001-react-native-and-expo.md)) |
+| Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](adr/0002-postgres-on-supabase.md)) |
 | LLM | Provider-agnostic, so each job can compare models from different providers. Vercel AI SDK + promptfoo for now; details when building |
-| Connectivity | Online only, decided 27 Oct ([why](../../docs/adr/0003-online-only.md)) |
+| Connectivity | Online only, decided 27 Oct ([why](adr/0003-online-only.md)) |
 | Codebase | One Expo project with Supabase inside, laid out so agents can work in parallel, decided 28 Oct ([layout](tech-stack.md#4-folders)) |
 
 **Modularity:** data access, function logic and auth sit behind our own modules, so the platform can change later (self-hosted Supabase, or AWS). Where they live: [tech-stack.md §4](tech-stack.md#4-folders).

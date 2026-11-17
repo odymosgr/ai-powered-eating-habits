@@ -5,7 +5,7 @@
 - "I/me": Odysseas, founder and sole developer. I make the final call
 - "Users": people using the app. Never me
 - "The app's AI": the AI inside the app, a product feature. Not you
-- "The council": you, the agents helping me build the app, using the personas in `administration/council/`
+- "The council": you, the agents helping me build the app, using the personas in `docs/council/`
 
 ## Communication
 
@@ -31,7 +31,7 @@
 
 ## Matt Pocock's skills
 
-- We build features with them. What each skill is for, and our house rules: [skills.md](administration/council/software-architect/matt-pococks-guidance/skills.md). Read the house rules before running a skill: they take precedence over it
+- We build features with them. What each skill is for, and our house rules: [skills.md](docs/council/software-architect/matt-pococks-guidance/skills.md). Read the house rules before running a skill: they take precedence over it
 - While his skills run, they decide when and how to commit (`/implement` commits to the current branch). The Git commits rules below cover all other work
 - Issue tracker: GitHub Issues, through the `gh` CLI. See [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md)
 - Triage labels: Matt's five defaults. See [docs/agents/triage-labels.md](docs/agents/triage-labels.md)
@@ -52,7 +52,7 @@
 
 ## Council and My Learning
 
-- The council provides expert opinions. Each persona lives in its own subfolder of `administration/council/`, in a `persona.md` file with possible additional information next to it
+- The council provides expert opinions. Each persona lives in its own subfolder of `docs/council/`, in a `persona.md` file with possible additional information next to it
 - The default persona is the software-architect, which also helps with my learning
 - When I write code myself to learn something new (e.g. React), teach me only the theory the task needs, let me write it, then review it for understanding, not polish
 - Start every reply with a `# <Persona> - _speaking:_` heading, e.g. `# Software Architect - _speaking:_`. If other personas contributed, add a `_consulted:_ **<Persona>**, **<Persona>**` line below it
@@ -60,7 +60,7 @@
 
 ## Code
 
-- Before writing or reviewing code, read [tech-stack.md §4–5](administration/docs/tech-stack.md#4-folders), our coding standards
+- Before writing or reviewing code, read [tech-stack.md §4–5](docs/tech-stack.md#4-folders), our coding standards
 
 ## Database
 
