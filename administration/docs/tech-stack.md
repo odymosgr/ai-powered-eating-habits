@@ -1,6 +1,6 @@
 # Tech Stack and Codebase
 
-**28 Oct 2026.** How the app's technologies fit together, where our code lives, and how agents work on it in parallel. Facts checked against the official docs on 27–28 Oct 2026. Stack decisions: [plan §9.4](product-plan.md#94-stack). Backend rules: [database-analysis.md §6](database-analysis.md#6-proposal).
+**28 Oct 2026.** How the app's technologies fit together, where our code lives, and how agents work on it in parallel. Facts checked against the official docs on 27–28 Oct 2026. Stack decisions: [plan §9.4](product-plan.md#94-stack). Backend rules: [supabase/AGENTS.md](../../supabase/AGENTS.md). Sections 4–5 are our coding standards: agents follow them, and `code-review` checks diffs against them.
 
 ## Contents
 
@@ -36,7 +36,7 @@ flowchart LR
 - **Supabase:** a hosted Postgres with services around it: an HTTP API generated from our tables, sign-in, live updates, and Edge Functions, where our server code runs.
 - **LLM:** called only from an Edge Function. Its API key costs money per call, and anything shipped in the app can be extracted.
 - **The AI extracts, code scores** ([plan §9.1](product-plan.md#91-the-ai-extracts-code-scores)): the LLM turns words into data; our code computes totals and scores.
-- **Exit seams:** our code reaches Supabase only through our own modules, so the platform stays replaceable ([guardrail 13](database-analysis.md#6-proposal)).
+- **Exit seams:** our code reaches Supabase only through our own modules, so the platform stays replaceable ([why](../../docs/adr/0002-postgres-on-supabase.md)).
 
 ## 2. One meal log's journey
 
@@ -65,7 +65,7 @@ sequenceDiagram
     App->>You: 5. Result: totals from shared code
 ```
 
-*Open, decided when the log thread is grilled:* who starts the parse (a database webhook, or the app after saving), and live updates or polling.
+*Open, decided when the log thread is grilled:* who starts the parse (a database webhook, or the app after saving), and live updates or polling. The log thread's spec then replaces this section.
 
 ## 3. Keys and access
 
@@ -112,15 +112,6 @@ Arrows are imports; lint blocks the rest ([§5](#5-working-with-agents)).
 
 - **Conventions:** kebab-case file names; `@/` imports instead of `../`; tests beside their code as `*.test.ts(x)`, never in `src/app/`, where every file is a route.
 - **Open risk:** Deno may not resolve imports from `src/shared/`. Setup step 9 tests it; if it fails, the folder moves to `supabase/functions/_shared/`.
-
-**Feature map.** Each feature ticket keeps its row current.
-
-| Feature | Phone | Data | Backend |
-| --- | --- | --- | --- |
-| `auth` | `src/features/auth/` | `src/lib/auth.ts` | Supabase Auth, sign-ups off |
-| `day` | `src/features/day/` | `src/lib/data/day.ts` | Reads meal events and bodyweights |
-| `bodyweight` | `src/features/bodyweight/` | `src/lib/data/bodyweight.ts` | `bodyweights` table |
-| `meal-log` | `src/features/meal-log/` | `src/lib/data/meal-log.ts` | Log-thread and meal tables, `parse-log` function |
 
 ## 5. Working with agents
 
