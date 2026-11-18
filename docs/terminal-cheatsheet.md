@@ -4,12 +4,14 @@ Two paths. Pairing uses the IP and port from the pairing dialog; connecting uses
 ## Path 1: Pair Only, to Open the App
 1. Terminal, in the repo: `npx expo start`
 1. Kill stale adb server: `adb kill-server`
+1. Open adb server: `adb devices`
 1. Phone, Settings, Developer Options, Wireless Debugging -> Open & Pair Device with Pairing Code
 1. In another Terminal `adb pair <ip>:<port>`, then type the code (all info from the pairing dialog; the IP in numbers, not the `.local` name)
 1. Phone: scan the QR code from step 1 with the camera
 
 ## Path 2: Pair and Connect, to Install a New Build
-1. Pair: steps 2 to 4 of path 1
+1. Kill stale adb server: `adb kill-server`
+1. Open adb server: `adb devices`
 1. `adb connect <ip>:<port>`, with the IP and port from the main Wireless Debugging screen
 1. `adb devices` lists the phone as `device`. An `offline` entry means you used the pairing port: `adb disconnect`, then connect again
 1. Only if app.json's plugins, icon or splash changed: `rm -rf android`, so it gets regenerated (it's generated and git-ignored)
