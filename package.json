@@ -5,8 +5,10 @@
   "dependencies": {
     "@expo/ui": "~58.0.25",
     "@supabase/supabase-js": "2.119.0",
+    "@tanstack/react-query": "^5.108.0",
     "expo": "~58.0.21",
     "expo-constants": "~58.0.14",
+    "expo-crypto": "~58.0.8",
     "expo-dev-client": "~58.0.17",
     "expo-device": "~58.0.5",
     "expo-font": "~58.0.11",
@@ -53,6 +55,7 @@
     "lint": "expo lint",
     "test": "jest",
     "test:db": "supabase test db",
+    "gen:types": "supabase gen types typescript > src/lib/data/database.types.ts && prettier --write src/lib/data/database.types.ts",
     "check": "tsc --noEmit && npm run lint && npm test"
   },
   "jest": {
