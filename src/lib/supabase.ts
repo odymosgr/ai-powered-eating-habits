@@ -4,6 +4,8 @@ import "expo-sqlite/localStorage/install";
 import { createClient } from "@supabase/supabase-js";
 import Constants from "expo-constants";
 
+import type { Database } from "./data/database.types";
+
 const configuredUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const publishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
@@ -22,7 +24,7 @@ const url =
     : configuredUrl;
 
 // The app's only Supabase client (tech-stack.md §5).
-export const supabase = createClient(url, publishableKey, {
+export const supabase = createClient<Database>(url, publishableKey, {
   auth: {
     storage: localStorage,
     autoRefreshToken: true,
