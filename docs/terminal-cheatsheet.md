@@ -1,6 +1,9 @@
 # Connect Android Phone to Expo for Development
 Two paths. Pairing uses the IP and port from the pairing dialog; connecting uses the ones on the main Wireless Debugging screen.
 
+## New Wi-Fi network? 
+Restart Metro, because of stale IP
+
 ## Path 1: Pair Only, to Open the App
 1. Terminal, in the repo: `npx expo start`
 1. Kill stale adb server: `adb kill-server`
