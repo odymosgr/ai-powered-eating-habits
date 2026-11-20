@@ -15,6 +15,13 @@ export function startOfDay(day: string): Date {
   return new Date(year, month - 1, date);
 }
 
+// From the day's midnight up to, but not including, the next one.
+export function dayRange(day: string): { from: Date; to: Date } {
+  const from = startOfDay(day);
+  const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
+  return { from, to };
+}
+
 // Today lives in state: the React Compiler caches what a render computes, so
 // a `new Date()` in render would freeze until the app restarts. It's re-read
 // when the app returns to the foreground, and every minute while it stays
