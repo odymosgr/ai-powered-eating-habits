@@ -61,6 +61,7 @@
 ## Code
 
 - Before writing or reviewing code, read [tech-stack.md §4–5](docs/tech-stack.md#4-folders), our coding standards
+- Comments add what a reader can't get from the code: the why behind a decision (link its ADR or doc), a library gotcha and its workaround, and a function's contract (what it promises callers) when its name and types can't say it. Write a contract as `/** */`, so the editor shows it on hover
 
 ## Database
 
