@@ -102,7 +102,7 @@ Arrows are imports; lint blocks the rest ([§5](#5-working-with-agents)).
 | `src/app/` | Routes and layouts only (Expo Router): one-line files exporting a screen from its feature | Phone |
 | `src/features/<feature>/` | Screens, components, hooks in `api.ts` (TanStack Query), tests | Phone |
 | `src/components/ui/` | UI pieces that two or more features use | Phone |
-| `src/lib/` | `supabase.ts`, the only Supabase client; `data/<feature>.ts`, all reads and writes as plain functions; `auth.ts`, sign-in and the current user; later `outbox.ts` | Phone |
+| `src/lib/` | `supabase.ts`, the only Supabase client; `data/<feature>.ts`, all reads and writes as plain functions; `auth.ts`, sign-in and the current user; `query-client.ts`, the one TanStack Query cache; `ids.ts`, row IDs made on the phone; `days.ts`, today's date; later `outbox.ts` | Phone |
 | `src/shared/` | Plain TypeScript, free of React and Supabase: scoring, the LLM output schema | Phone, functions, Mac |
 | `supabase/migrations/` | The schema as ordered SQL: tables, grants, RLS, RPC functions | Postgres |
 | `supabase/functions/<name>/` | One Edge Function: a thin `index.ts` around plain modules | Edge Functions (Deno) |
@@ -111,6 +111,7 @@ Arrows are imports; lint blocks the rest ([§5](#5-working-with-agents)).
 | `.github/workflows/` | CI running the checks | GitHub |
 
 - **Conventions:** kebab-case file names; `@/` imports instead of `../`; tests beside their code as `*.test.ts(x)`, never in `src/app/`, where every file is a route.
+- **A screen's layers:** a one-line route in `src/app/`, the screen in its feature, the feature's hooks in `api.ts`, then `src/lib/data/`. The hooks own the query keys (one factory per feature), new rows' IDs and the refresh after a save, so a screen only shows data and takes input. Screen tests mock `src/lib/data/<feature>`.
 - **Open risk:** Deno may not resolve imports from `src/shared/`. Setup step 9 tests it; if it fails, the folder moves to `supabase/functions/_shared/`.
 
 ## 5. Working with agents

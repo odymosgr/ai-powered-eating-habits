@@ -453,6 +453,7 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 | Part | Decision |
 | --- | --- |
 | Client | React Native + Expo, locked 27 Oct ([why](adr/0001-react-native-and-expo.md)) |
+| Server state on the phone | TanStack Query: one cache of what screens read from Supabase, refetched when stale ([where](tech-stack.md#4-folders)) |
 | Database and backend platform | Postgres on Supabase, decided 27 Oct ([why](adr/0002-postgres-on-supabase.md)) |
 | LLM | Provider-agnostic, so each job can compare models from different providers. Vercel AI SDK + promptfoo for now; details when building |
 | Connectivity | Online only, decided 27 Oct ([why](adr/0003-online-only.md)) |

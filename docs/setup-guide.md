@@ -18,7 +18,7 @@ Commands were checked against the official docs on 28 Oct 2026. Open each step's
 - [x] [5. Supabase on your Mac](#5-supabase-on-your-mac)
 - [x] [6. First table, locked down and tested](#6-first-table-locked-down-and-tested)
 - [x] [7. The phone signs in](#7-the-phone-signs-in)
-- [ ] [8. Tracer bullet: log your weight](#8-tracer-bullet-log-your-weight)
+- [x] [8. Tracer bullet: log your weight](#8-tracer-bullet-log-your-weight)
 - [ ] [9. First Edge Function](#9-first-edge-function), with the log thread
 - [ ] [10. The cloud project](#10-the-cloud-project), with the log thread
 - [ ] [11. CI on GitHub](#11-ci-on-github)
@@ -296,17 +296,18 @@ A tracer bullet is Matt's term for the thinnest slice through every layer, provi
 **Do**
 
 ```bash
-npx expo install @tanstack/react-query
-npx supabase gen types typescript --local > src/lib/data/database.types.ts
+npx expo install @tanstack/react-query expo-crypto
+npm run gen:types
 ```
 
-- **Types script:** save the type generation as a script, `gen:types`, and rerun it after every migration.
+- **Types:** the `gen:types` script writes the database's types to `src/lib/data/database.types.ts`, then runs Prettier on them. `src/lib/supabase.ts` types its client with them. Rerun it after every migration.
+- **`src/lib/ids.ts`:** row IDs made on the phone, as UUIDv7 ([why](../supabase/AGENTS.md)). `expo-crypto` supplies the random bytes.
 - **`src/lib/data/bodyweight.ts`:** save and list, as plain functions that return our own types.
-- **`src/app/_layout.tsx`:** add the query client provider.
+- **`src/lib/query-client.ts`:** the one cache. It refetches when the app returns to the foreground and empties on sign-out. `src/app/_layout.tsx` provides it.
 - **`src/features/bodyweight/`:**
-  - its hooks, in `api.ts`;
+  - its hooks, in `api.ts` (a screen's layers: [tech-stack.md §4](tech-stack.md#4-folders));
   - a bare screen: a number field, a Save button and today's entries.
-- **Today's date, read outside render:** the React Compiler (on in `app.json`) caches what a render computes, so a `new Date()` there freezes until the app restarts. Keep today in state that updates when the app returns to the foreground, and give `DayScreen` the same fix.
+- **Today's date, read outside render:** the React Compiler (on in `app.json`) caches what a render computes, so a `new Date()` there freezes until the app restarts. `useToday`, in `src/lib/days.ts`, keeps today in state, updated when the app returns to the foreground and every minute. `DayScreen` uses it too.
 
 **Borrow:** two Obytes files:
 
