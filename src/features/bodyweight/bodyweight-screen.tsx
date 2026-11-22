@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useToday } from "@/lib/days";
-import { newId } from "@/lib/ids";
 
 import { useBodyweightsOn, useSaveBodyweight } from "./api";
 
@@ -17,19 +16,13 @@ export function BodyweightScreen() {
 
 function LogBodyweight() {
   const [text, setText] = useState("");
-  const save = useSaveBodyweight();
+  const { save, isPending, isError } = useSaveBodyweight();
   const weightKg = parseWeight(text);
-  const canSave = weightKg !== null && !save.isPending;
+  const canSave = weightKg !== null && !isPending;
 
   function handleSave() {
     if (!canSave) return;
-    // The same weight right after a failed save is a retry of that entry, so
-    // it keeps its ID.
-    const id =
-      save.isError && save.variables.weightKg === weightKg
-        ? save.variables.id
-        : newId();
-    save.mutate({ id, weightKg }, { onSuccess: () => setText("") });
+    save(weightKg, { onSuccess: () => setText("") });
   }
 
   return (
@@ -55,11 +48,11 @@ function LogBodyweight() {
           ]}
         >
           <Text style={styles.buttonText}>
-            {save.isPending ? "Saving…" : "Save"}
+            {isPending ? "Saving…" : "Save"}
           </Text>
         </Pressable>
       </View>
-      {save.isError ? (
+      {isError ? (
         <Text style={styles.error}>{"Couldn't save your weight."}</Text>
       ) : null}
     </View>
