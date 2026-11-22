@@ -1,8 +1,9 @@
 import { getRandomBytes } from "expo-crypto";
 
-// A UUIDv7 (RFC 9562): 48 bits of Unix time in milliseconds, then random bits,
-// so IDs sort by creation time. The phone makes every row's ID before saving,
-// so a retry can't create a duplicate (supabase/AGENTS.md).
+/**
+ * A UUIDv7 (RFC 9562), so IDs sort by creation time. Why the phone makes them:
+ * supabase/AGENTS.md.
+ */
 export function newId(
   now: number = Date.now(),
   random: Uint8Array = getRandomBytes(10),

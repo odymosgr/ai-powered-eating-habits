@@ -16,7 +16,6 @@ export function SignInScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
-  // Lets the email field's "Next" key move the cursor to the password field.
   const passwordInput = useRef<ComponentRef<typeof TextInput>>(null);
 
   async function handleSignIn() {
@@ -29,7 +28,6 @@ export function SignInScreen() {
   }
 
   return (
-    // Tapping outside the fields closes the keyboard.
     <Pressable
       style={styles.screen}
       onPress={Keyboard.dismiss}

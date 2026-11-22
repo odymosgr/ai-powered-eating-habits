@@ -2,9 +2,11 @@ import { supabase } from "@/lib/supabase";
 
 export type Bodyweight = { id: string; weightKg: number; measuredAt: Date };
 
-// `id` comes from newId(), made once per entry and reused on every retry.
-// A retry whose first attempt already landed (only the reply was lost) hits
-// the duplicate key error 23505, so that counts as saved.
+/**
+ * `id` comes from newId(), made once per entry and reused on every retry.
+ * A retry whose first attempt already landed (only the reply was lost) hits
+ * the duplicate key error 23505, so that counts as saved.
+ */
 export async function saveBodyweight(entry: {
   id: string;
   weightKg: number;
@@ -16,7 +18,7 @@ export async function saveBodyweight(entry: {
   if (error && error.code !== "23505") throw error;
 }
 
-// From `from` up to, but not including, `to`, oldest first.
+/** From `from` up to, but not including, `to`, oldest first. */
 export async function listBodyweights(
   from: Date,
   to: Date,
