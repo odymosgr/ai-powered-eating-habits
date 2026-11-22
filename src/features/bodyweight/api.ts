@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { listBodyweights } from "@/lib/data/bodyweight";
+import { listBodyweights, saveBodyweight } from "@/lib/data/bodyweight";
 import { dayRange } from "@/lib/days";
 
 // Every key starts with "bodyweights", so a save can refresh all bodyweight
@@ -17,5 +17,15 @@ export function useBodyweightsOn(day: string) {
       const { from, to } = dayRange(day);
       return listBodyweights(from, to);
     },
+  });
+}
+
+export function useSaveBodyweight() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: saveBodyweight,
+    // Returning the refetch keeps the save pending until the new weight shows.
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: bodyweightKeys.all }),
   });
 }
