@@ -4,6 +4,9 @@ Two paths. Pairing uses the IP and port from the pairing dialog; connecting uses
 ## New Wi-Fi network? 
 Restart Metro, because of stale IP
 
+## Phone: Wireless Debugging
+Android Phone: Settings -> System -> Developer Options -> **Wireless Debugging**
+
 ## Path 1: Pair Only, to Open the App
 1. Terminal, in the repo: `npx expo start`
 1. Kill stale adb server: `adb kill-server`
