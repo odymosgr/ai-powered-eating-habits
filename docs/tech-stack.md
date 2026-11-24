@@ -120,7 +120,7 @@ The aim: several agents at work at once, none touching another's files, each pro
 
 | Check | Runs | When |
 | --- | --- | --- |
-| `npm run check` | TypeScript, ESLint with Prettier, Jest | Before calling any change done; CI on every pull request |
+| `npm run check` | TypeScript, ESLint with Prettier, Jest. It first generates Expo's types, which Metro otherwise makes, so links to routes are checked in a fresh worktree and in CI | Before calling any change done; CI on every pull request |
 | `npm run test:db` | pgTAP on the local Supabase stack | When `supabase/` changed; CI |
 | `npm run evals` | promptfoo | When a prompt or model changed; comes with `parse-log` |
 

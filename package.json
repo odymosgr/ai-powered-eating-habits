@@ -56,7 +56,7 @@
     "test": "jest",
     "test:db": "supabase test db",
     "gen:types": "supabase gen types typescript > src/lib/data/database.types.ts && prettier --write src/lib/data/database.types.ts",
-    "check": "tsc --noEmit && npm run lint && npm test"
+    "check": "expo customize tsconfig.json && tsc --noEmit && npm run lint && npm test"
   },
   "jest": {
     "preset": "jest-expo"
