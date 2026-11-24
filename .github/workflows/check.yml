@@ -1,0 +1,40 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# The workflow's token can only read the repo.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # GitHub's default is 6 hours, which a hung test would hold the runner for.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+
+  db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx supabase db start
+      - run: npm run test:db
+      - run: npx supabase db advisors --fail-on warn
+      - name: Database types match the migrations
+        run: npm run gen:types && git diff --exit-code src/lib/data/database.types.ts
