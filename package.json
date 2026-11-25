@@ -59,7 +59,10 @@
     "check": "expo customize tsconfig.json && tsc --noEmit && npm run lint && npm test"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.claude/"
+    ]
   },
   "expo": {
     "install": {

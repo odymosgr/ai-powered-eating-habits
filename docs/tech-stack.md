@@ -126,7 +126,7 @@ The aim: several agents at work at once, none touching another's files, each pro
 
 - **One owner per file.** Expo Router needs no central route list, so a new screen is a new file. Shared files (`_layout.tsx` files, `src/components/ui/`, `src/lib/supabase.ts`, `package.json`) change in small tickets of their own. No `index.ts` barrels that every feature edits.
 - **Typed edges.** Features meet only through `src/lib/` and `src/shared/`. Lint stops a feature importing another feature, and anything outside `src/lib/` importing Supabase.
-- **One worktree per agent,** each with its own branch and `npm install`.
+- **One worktree per agent,** each with its own branch and `npm install`. Git and Jest skip their folder, `.claude/worktrees/`, or the main folder's tests would run theirs too. `.worktreeinclude` lists the ignored files each new one gets.
 - **Database changes go one at a time.** All worktrees share one local Supabase stack, and migrations run in order. Phone-only tickets run in parallel.
 - **Regenerate, don't merge.** On a conflict in `package-lock.json` or the database types, rerun `npm install` or `npm run gen:types`.
 - **Area rules** live in the area's `AGENTS.md`, the first being `supabase/AGENTS.md` (setup step 6). A section of the root `AGENTS.md` links to it as a plain link: an `@` import would load the rules into every session ([docs](https://code.claude.com/docs/en/memory#agents-md)), while a link is read only for that area's tasks.
