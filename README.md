@@ -1,12 +1,16 @@
 # AI-Powered Eating Habits
 
-A mobile app that turns quick voice, text or photo logs into a clear weekly view of your eating habits, with an AI dietitian that helps you change them one small step at a time. A solo project, built to learn AI software engineering, maybe even produce money.
+A mobile app that turns quick voice, text or photo logs into a clear weekly view of your eating habits, with an AI dietitian that helps you change them one small step at a time. 
+
+A solo project, built to learn AI software engineering, maybe even a business.
 
 [Product plan](docs/product-plan.md) · [Tech stack and codebase](docs/tech-stack.md) 
 
-## Building Log
+# Building Log
 
 What I did, week by week. Start date: 6 Oct 2026.
+
+## Half-Time
 
 - **Weeks 1–2:** put all my ideas on paper to get a complete view of the project, even a basic homepage design. Transcribed them with Claude into a product plan.
 - **Week 3:** rest, and review of the product plan details.
@@ -14,8 +18,9 @@ What I did, week by week. Start date: 6 Oct 2026.
 - **Week 5:** Learned react-native basics. ESLint, Prettier & Jest. Personal artistic preparations.
 - **Week 6:** Supabase w/ Docker setup. More learning react-native & supabase. Basic sign-in screen.
 - **Week 7:** Matt Pocock's Skills: Introduction, Set-Up. TanStack Query setup for server state cache in client.
+- **Week 8:** CI set-up through GitHub. Worktrees hands-on.
 
-## Decision Log
+# Decision Log
 
 Copied from [docs/adr/](docs/adr/), the source of truth.
 
