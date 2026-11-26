@@ -13,12 +13,11 @@ What I did, week by week. Start date: 6 Oct 2026.
 ## Half-Time
 
 - **Weeks 1–2:** put all my ideas on paper to get a complete view of the project, even a basic homepage design. Transcribed them with Claude into a product plan.
-- **Week 3:** rest, and review of the product plan details.
-- **Week 4:** continued with long-term decisions, made the Weight Room wireframes and the voice-to-meal-logging flow. Also initialized react-native setup.
-- **Week 5:** Learned react-native basics. ESLint, Prettier & Jest. Personal artistic preparations.
-- **Week 6:** Supabase w/ Docker setup. More learning react-native & supabase. Basic sign-in screen.
-- **Week 7:** Matt Pocock's Skills: Introduction, Set-Up. TanStack Query setup for server state cache in client.
-- **Week 8:** CI set-up through GitHub. Worktrees hands-on.
+- **Week 3:** continued with long-term decisions, made the Weight Room wireframes and the voice-to-meal-logging flow. Also initialized react-native setup.
+- **Week 4:** Learned react-native basics. ESLint, Prettier & Jest.
+- **Week 5:** Supabase w/ Docker setup. More learning react-native & supabase. Basic sign-in screen.
+- **Week 6:** Matt Pocock's Skills: Introduction, Set-Up. TanStack Query setup for server state cache in client.
+- **Week 7:** CI set-up through GitHub. Worktrees hands-on.
 
 # Decision Log
 
