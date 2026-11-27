@@ -33,6 +33,9 @@
 
 - We build features with them. What each skill is for, and our house rules: [skills.md](docs/council/software-architect/matt-pococks-guidance/skills.md). Read the house rules before running a skill: they take precedence over it
 - While his skills run, they decide when and how to commit (`/implement` commits to the current branch). The Git commits rules below cover all other work
+- A feature session, one that runs `/grill-with-docs`, `/implement` or `/implement-spec`, works in its own worktree:
+  - First step, unless it already runs in one: EnterWorktree. It branches from `main` on GitHub, so if my local `main` is ahead of it, ask me to push first
+  - Last step, once the work is committed and [the checks](docs/tech-stack.md#5-working-with-agents) are green: push the branch and open the pull request
 - Issue tracker: GitHub Issues, through the `gh` CLI. See [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md)
 - Triage labels: Matt's five defaults. See [docs/agents/triage-labels.md](docs/agents/triage-labels.md)
 - Domain docs: single-context, one `GLOSSARY.md` and `docs/adr/` at the repo root. See [docs/agents/domain.md](docs/agents/domain.md)

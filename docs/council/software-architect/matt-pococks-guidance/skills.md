@@ -78,7 +78,7 @@ Other skills load these; you rarely call them yourself.
 
 ## House rules
 
-1. **A feature lands through a pull request you merge, after your own review and tests.** Its session runs in its own worktree and branch, never on `main`. No agent merges or turns on auto-merge, unlike Matt's repo, where pull requests auto-merge once CI passes.
+1. **A feature lands through a pull request you merge, after your own review and tests.** Its session opens the pull request from its own worktree ([AGENTS.md](../../../../AGENTS.md#matt-pococks-skills)). No agent merges or turns on auto-merge, unlike Matt's repo, where pull requests auto-merge once CI passes.
 2. **New to you.** A PR description ends with up to 3 concepts the diff uses that I haven't met yet, each linked to its line and explained in one sentence.
 3. **The glossary starts from the product plan.** `domain-modeling` drafts a new term from [product-plan.md](../../../product-plan.md)'s wording; the plan then links to the glossary instead of defining the term again.
 
