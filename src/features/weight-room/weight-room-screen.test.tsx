@@ -583,3 +583,256 @@ describe("header", () => {
     },
   );
 });
+
+describe("week picker", () => {
+  const weekCards = () =>
+    screen.findAllByRole("button", { name: /'\d\d week \d/ });
+
+  test("shows a card per week from the first bodyweight's week to the current week, numbered within the month of its Monday", async () => {
+    jest.mocked(listBodyweightEntryAttempts).mockResolvedValue([
+      // Declined and cleared attempts are no bodyweight, so they start no week.
+      attempt("2026-08-20", 80, false),
+      attempt("2026-08-24", null),
+      // Tuesday of the week of Monday August 31, August's 5th Monday.
+      attempt("2026-09-01", 80),
+    ]);
+    await renderScreen();
+
+    const labels = (await weekCards()).map(
+      (card) => within(card).getByText(/week/).props.children,
+    );
+    expect(labels).toEqual([
+      "Aug '26 week 5",
+      "Sep '26 week 1",
+      "Sep '26 week 2",
+      "Sep '26 week 3",
+      "Sep '26 week 4",
+      "Oct '26 week 1",
+      "Oct '26 week 2",
+      "Oct '26 week 3",
+      "Oct '26 week 4",
+      "Nov '26 week 1",
+      "Nov '26 week 2",
+      "Nov '26 week 3",
+      "Nov '26 week 4",
+    ]);
+  });
+
+  test("with no bodyweight yet, shows only the current week", async () => {
+    jest.mocked(listBodyweightEntryAttempts).mockResolvedValue([]);
+    await renderScreen();
+
+    expect(await weekCards()).toHaveLength(1);
+    expect(screen.getByText("Nov '26 week 4")).toBeOnTheScreen();
+  });
+
+  test("a card's fill height shows its days with a bodyweight out of 7", async () => {
+    const fullWeek = [9, 10, 11, 12, 13, 14, 15].map((date) =>
+      attempt(`2026-11-${String(date).padStart(2, "0")}`, 80),
+    );
+    jest
+      .mocked(listBodyweightEntryAttempts)
+      .mockResolvedValue([
+        ...fullWeek,
+        attempt("2026-11-16", 80),
+        attempt("2026-11-17", 80),
+        attempt("2026-11-18", 80, false),
+        attempt("2026-11-19", 80),
+        attempt("2026-11-19", null),
+      ]);
+    await renderScreen();
+
+    const full = await screen.findByRole("button", {
+      name: "Nov '26 week 2, 7 of 7 days",
+    });
+    expect(within(full).getByTestId("fill")).toHaveStyle({ height: "100%" });
+    expect(
+      screen.getByRole("button", { name: "Nov '26 week 3, 2 of 7 days" }),
+    ).toBeOnTheScreen();
+    const empty = screen.getByRole("button", {
+      name: "Nov '26 week 4, 0 of 7 days",
+    });
+    expect(within(empty).getByTestId("fill")).toHaveStyle({ height: "0%" });
+  });
+
+  test("opens on the current week", async () => {
+    jest
+      .mocked(listBodyweightEntryAttempts)
+      .mockResolvedValue([attempt("2026-11-10", 80)]);
+    await renderScreen();
+
+    expect(
+      await screen.findByRole("button", { name: /Nov '26 week 4/ }),
+    ).toBeSelected();
+    expect(
+      screen.getByRole("button", { name: /Nov '26 week 3/ }),
+    ).not.toBeSelected();
+    expect(screen.getByText("Nov 23 – Nov 29")).toBeOnTheScreen();
+  });
+
+  test("selecting a past week shows its chart, weight window and dates; days older than the editable window are read-only", async () => {
+    jest
+      .mocked(listBodyweightEntryAttempts)
+      .mockResolvedValue([
+        attempt("2026-11-16", 78),
+        attempt("2026-11-20", 79),
+        attempt("2026-11-21", 80),
+        attempt("2026-11-27", 90),
+      ]);
+    await renderScreen();
+
+    const week3 = await screen.findByRole("button", {
+      name: /Nov '26 week 3/,
+    });
+    await userEvent.press(week3);
+
+    expect(week3).toBeSelected();
+    expect(screen.getByText("Nov 16 – Nov 22")).toBeOnTheScreen();
+    // Average 79 kg: 76.5 to 81.5, rounded to 77 to 82.
+    expect(screen.getByText("82 kg")).toBeOnTheScreen();
+    expect(screen.getByText("77 kg")).toBeOnTheScreen();
+    expect(screen.queryByText("90")).toBeNull();
+    const monday = screen.getByLabelText("Monday, November 16, 78 kg");
+    expect(within(monday).getByText("78")).toBeOnTheScreen();
+    expect(within(monday).getByText("M")).toHaveStyle({
+      fontWeight: "400",
+      color: "#9e9e9e",
+    });
+    expect(
+      screen.queryByRole("button", { name: /Monday, November 16/ }),
+    ).toBeNull();
+    const tuesday = screen.getByLabelText(
+      "Tuesday, November 17, no bodyweight",
+    );
+    expect(within(tuesday).getByText("?")).toBeOnTheScreen();
+    // Saturday and Sunday are within today and the 6 days before it.
+    expect(
+      screen.getByRole("button", { name: "Saturday, November 21, 80 kg" }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", {
+        name: "Sunday, November 22, no bodyweight",
+      }),
+    ).toBeOnTheScreen();
+  });
+
+  test("tapping a read-only day does nothing", async () => {
+    jest
+      .mocked(listBodyweightEntryAttempts)
+      .mockResolvedValue([attempt("2026-11-16", 78)]);
+    await renderScreen();
+
+    await userEvent.press(
+      await screen.findByRole("button", { name: /Nov '26 week 3/ }),
+    );
+    await userEvent.press(screen.getByLabelText("Monday, November 16, 78 kg"));
+
+    expect(screen.queryByPlaceholderText("Weight in kg")).toBeNull();
+  });
+
+  test("an editable day in a past week can still be set", async () => {
+    jest
+      .mocked(listBodyweightEntryAttempts)
+      .mockResolvedValue([attempt("2026-11-16", 78)]);
+    jest.mocked(saveBodyweightEntryAttempt).mockResolvedValue(undefined);
+    await renderScreen();
+
+    await userEvent.press(
+      await screen.findByRole("button", { name: /Nov '26 week 3/ }),
+    );
+    await userEvent.press(
+      screen.getByRole("button", {
+        name: "Sunday, November 22, no bodyweight",
+      }),
+    );
+    expect(screen.getByText("Sunday, November 22")).toBeOnTheScreen();
+    await userEvent.type(field(), "79");
+    await userEvent.press(saveButton());
+
+    await waitFor(() =>
+      expect(savedAttempts()).toEqual([
+        expect.objectContaining({
+          day: "2026-11-22",
+          weightKg: 79,
+          confirmed: true,
+        }),
+      ]),
+    );
+  });
+
+  describe("a past week's header", () => {
+    const previousWeek = [
+      "2026-11-09",
+      "2026-11-10",
+      "2026-11-12",
+      "2026-11-15",
+    ];
+    const pastWeek = ["2026-11-16", "2026-11-17", "2026-11-19", "2026-11-22"];
+    const pickWeek3 = async () =>
+      userEvent.press(
+        await screen.findByRole("button", { name: /Nov '26 week 3/ }),
+      );
+
+    test("shows its week trend: its average against the previous week's", async () => {
+      jest
+        .mocked(listBodyweightEntryAttempts)
+        .mockResolvedValue([
+          ...previousWeek.map((day) => attempt(day, 80)),
+          ...pastWeek.map((day, index) => attempt(day, index < 2 ? 79 : 78)),
+          attempt("2026-11-18", 50, false),
+        ]);
+      await renderScreen();
+
+      await pickWeek3();
+
+      // 78.5 kg against 80 kg.
+      expect(screen.getByText("Week trend: -1.9%")).toBeOnTheScreen();
+      expect(screen.queryByText(/Recent trend/)).toBeNull();
+      await userEvent.press(
+        screen.getByRole("button", { name: "About the week trend" }),
+      );
+      expect(
+        screen.getByText(
+          "This week averages 78.5 kg, against 80 kg the week before: -1.9%.",
+        ),
+      ).toBeOnTheScreen();
+    });
+
+    test.each([
+      ["the week", previousWeek, pastWeek.slice(1)],
+      ["the previous week", previousWeek.slice(1), pastWeek],
+    ])(
+      "the week trend is N/A when %s has fewer than 4 days with a bodyweight",
+      async (_week, previousDays, pastDays) => {
+        jest
+          .mocked(listBodyweightEntryAttempts)
+          .mockResolvedValue(
+            [...previousDays, ...pastDays].map((day) => attempt(day, 80)),
+          );
+        await renderScreen();
+
+        await pickWeek3();
+
+        expect(screen.getByText("Week trend: N/A")).toBeOnTheScreen();
+        await userEvent.press(
+          screen.getByRole("button", { name: "About the week trend" }),
+        );
+        expect(screen.getByText("N/A due to missing data")).toBeOnTheScreen();
+      },
+    );
+
+    test("returning to the current week shows the recent trend again", async () => {
+      jest
+        .mocked(listBodyweightEntryAttempts)
+        .mockResolvedValue(pastWeek.map((day) => attempt(day, 80)));
+      await renderScreen();
+
+      await pickWeek3();
+      await userEvent.press(
+        screen.getByRole("button", { name: /Nov '26 week 4/ }),
+      );
+
+      expect(screen.getByText("Recent trend: N/A")).toBeOnTheScreen();
+    });
+  });
+});

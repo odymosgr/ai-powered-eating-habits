@@ -106,6 +106,75 @@ export function recentTrend(
   };
 }
 
+/**
+ * The average bodyweight of the week starting `monday` against the previous
+ * week's, and the change in %. Null when either week has fewer than 4 days
+ * with a bodyweight (spec #1).
+ */
+export function weekTrend(
+  attempts: BodyweightEntryAttempt[],
+  monday: string,
+): { week: number; before: number; percent: number } | null {
+  const week = bodyweightsOf(attempts, weekOf(monday));
+  const before = bodyweightsOf(attempts, weekOf(addDays(monday, -7)));
+  if (week.length < 4 || before.length < 4) return null;
+  const [weekAverage, beforeAverage] = [average(week), average(before)];
+  return {
+    week: weekAverage,
+    before: beforeAverage,
+    percent: ((weekAverage - beforeAverage) / beforeAverage) * 100,
+  };
+}
+
+export type WeekCard = {
+  monday: string;
+  /** Like "Nov '26 week 4": the month of its Monday, numbered 1–5 within it. */
+  label: string;
+  daysWithBodyweight: number;
+};
+
+/**
+ * The week picker's cards, oldest first: from the week of the first
+ * bodyweight to the current week, or the current week alone (spec #1).
+ */
+export function weekCards(
+  attempts: BodyweightEntryAttempt[],
+  today: string,
+): WeekCard[] {
+  const days = new Set(attempts.map((a) => a.day));
+  const firstDay =
+    [...days].sort().find((day) => bodyweightOn(attempts, day) !== null) ??
+    today;
+  const cards: WeekCard[] = [];
+  const currentMonday = weekOf(today)[0];
+  for (
+    let monday = weekOf(firstDay)[0];
+    monday <= currentMonday;
+    monday = addDays(monday, 7)
+  ) {
+    const date = startOfDay(monday);
+    const month = date.toLocaleDateString("en-US", { month: "short" });
+    const year = String(date.getFullYear()).slice(-2);
+    cards.push({
+      monday,
+      label: `${month} '${year} week ${Math.ceil(date.getDate() / 7)}`,
+      daysWithBodyweight: bodyweightsOf(attempts, weekOf(monday)).length,
+    });
+  }
+  return cards;
+}
+
+/** The bodyweights of `days`, skipping days without one. */
+export function bodyweightsOf(
+  attempts: BodyweightEntryAttempt[],
+  days: string[],
+): number[] {
+  return days.flatMap((day) => {
+    const bodyweight = bodyweightOn(attempts, day);
+    return bodyweight === null ? [] : [bodyweight];
+  });
+}
+
 function average(values: number[]): number {
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }

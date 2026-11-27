@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Modal,
   Pressable,
+  ScrollView,
+  type ScrollViewInstance,
   StyleSheet,
   Text,
   TextInput,
@@ -20,7 +22,10 @@ import {
   confirmationReasons,
   isEditable,
   recentTrend,
+  type WeekCard,
+  weekCards,
   weekOf,
+  weekTrend,
   weightWindow,
 } from "./bodyweights";
 
@@ -29,6 +34,9 @@ export function WeightRoomScreen() {
   const { data, isError } = useBodyweightEntryAttempts();
   // The day the sheet is open on, or null while it's closed.
   const [sheetDay, setSheetDay] = useState<string | null>(null);
+  // The Monday of the week picked, or null for the current week.
+  const [pickedMonday, setPickedMonday] = useState<string | null>(null);
+  const week = weekOf(pickedMonday ?? today);
 
   // Rows already on screen stay when a refetch fails, so the error shows
   // only when there is nothing to show instead.
@@ -46,8 +54,18 @@ export function WeightRoomScreen() {
 
   return (
     <View style={styles.screen}>
-      <Header attempts={data} today={today} />
-      <WeekChart attempts={data} today={today} onDayPress={setSheetDay} />
+      <WeekPicker
+        cards={weekCards(data, today)}
+        selected={week[0]}
+        onSelect={setPickedMonday}
+      />
+      <Header attempts={data} week={week} today={today} />
+      <WeekChart
+        attempts={data}
+        week={week}
+        today={today}
+        onDayPress={setSheetDay}
+      />
       <Pressable
         accessibilityRole="button"
         onPress={() => setSheetDay(today)}
@@ -74,16 +92,81 @@ export function WeightRoomScreen() {
   );
 }
 
+const CARD_WIDTH = 96;
+const CARD_GAP = 8;
+
+function WeekPicker({
+  cards,
+  selected,
+  onSelect,
+}: {
+  cards: WeekCard[];
+  selected: string;
+  onSelect: (monday: string) => void;
+}) {
+  const scrollView = useRef<ScrollViewInstance>(null);
+  const [viewportWidth, setViewportWidth] = useState(0);
+
+  function select(index: number) {
+    onSelect(cards[index].monday);
+    // ScrollView clamps the offset, so the first and last cards stay at the ends.
+    const x =
+      index * (CARD_WIDTH + CARD_GAP) - (viewportWidth - CARD_WIDTH) / 2;
+    scrollView.current?.scrollTo({ x: Math.max(0, x) });
+  }
+
+  return (
+    <ScrollView
+      ref={scrollView}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.picker}
+      onLayout={(event) => setViewportWidth(event.nativeEvent.layout.width)}
+      // Opens on the current week, the last card.
+      onContentSizeChange={() =>
+        scrollView.current?.scrollToEnd({ animated: false })
+      }
+    >
+      {cards.map((card, index) => (
+        <Pressable
+          key={card.monday}
+          accessibilityRole="button"
+          accessibilityLabel={`${card.label}, ${card.daysWithBodyweight} of 7 days`}
+          accessibilityState={{ selected: card.monday === selected }}
+          onPress={() => select(index)}
+          style={({ pressed }) => [
+            styles.card,
+            card.monday === selected && styles.selectedCard,
+            pressed && styles.dimmed,
+          ]}
+        >
+          <View
+            testID="fill"
+            style={[
+              styles.fill,
+              { height: `${(card.daysWithBodyweight / 7) * 100}%` },
+            ]}
+          />
+          <Text style={styles.cardLabel}>{card.label}</Text>
+        </Pressable>
+      ))}
+    </ScrollView>
+  );
+}
+
 function Header({
   attempts,
+  week,
   today,
 }: {
   attempts: BodyweightEntryAttempt[];
+  week: string[];
   today: string;
 }) {
   const [isHelpOpen, setHelpOpen] = useState(false);
-  const trend = recentTrend(attempts, today);
-  const week = weekOf(today);
+  const trend = week.includes(today)
+    ? recentTrendText(attempts, today)
+    : weekTrendText(attempts, week[0]);
   const shortDate = (day: string) =>
     startOfDay(day).toLocaleDateString("en-US", {
       month: "short",
@@ -94,11 +177,11 @@ function Header({
     <View style={styles.header}>
       <View style={styles.trendRow}>
         <Text style={styles.trend}>
-          {`Recent trend: ${trend ? formatPercent(trend.percent) : "N/A"}`}
+          {`${trend.name}: ${trend.percent ?? "N/A"}`}
         </Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="About the recent trend"
+          accessibilityLabel={`About the ${trend.name.toLowerCase()}`}
           onPress={() => setHelpOpen((open) => !open)}
           style={({ pressed }) => [styles.help, pressed && styles.dimmed]}
         >
@@ -107,9 +190,7 @@ function Header({
       </View>
       {isHelpOpen ? (
         <Text style={styles.muted}>
-          {trend
-            ? `The last 3 days average ${formatKg(trend.recent)} kg, against ${formatKg(trend.before)} kg in the 3 days before them: ${formatPercent(trend.percent)}.`
-            : "N/A due to missing data"}
+          {trend.explanation ?? "N/A due to missing data"}
         </Text>
       ) : null}
       <Text style={styles.muted}>
@@ -117,6 +198,41 @@ function Header({
       </Text>
     </View>
   );
+}
+
+// The current week shows the recent trend; a past week its week trend (spec #1).
+type TrendText = {
+  name: string;
+  percent: string | null;
+  explanation: string | null;
+};
+
+function recentTrendText(
+  attempts: BodyweightEntryAttempt[],
+  today: string,
+): TrendText {
+  const trend = recentTrend(attempts, today);
+  if (!trend) return { name: "Recent trend", percent: null, explanation: null };
+  const percent = formatPercent(trend.percent);
+  return {
+    name: "Recent trend",
+    percent,
+    explanation: `The last 3 days average ${formatKg(trend.recent)} kg, against ${formatKg(trend.before)} kg in the 3 days before them: ${percent}.`,
+  };
+}
+
+function weekTrendText(
+  attempts: BodyweightEntryAttempt[],
+  monday: string,
+): TrendText {
+  const trend = weekTrend(attempts, monday);
+  if (!trend) return { name: "Week trend", percent: null, explanation: null };
+  const percent = formatPercent(trend.percent);
+  return {
+    name: "Week trend",
+    percent,
+    explanation: `This week averages ${formatKg(trend.week)} kg, against ${formatKg(trend.before)} kg the week before: ${percent}.`,
+  };
 }
 
 function formatPercent(percent: number): string {
@@ -132,14 +248,16 @@ function formatKg(kg: number): string {
 
 function WeekChart({
   attempts,
+  week,
   today,
   onDayPress,
 }: {
   attempts: BodyweightEntryAttempt[];
+  week: string[];
   today: string;
   onDayPress: (day: string) => void;
 }) {
-  const days = weekOf(today).map((day) => ({
+  const days = week.map((day) => ({
     day,
     bodyweight: bodyweightOn(attempts, day),
   }));
@@ -378,12 +496,32 @@ const colors = {
   sheet: "#ffffff",
   backdrop: "rgba(0, 0, 0, 0.3)",
   primary: "#2f6fed",
+  fill: "#dce7fd",
   onPrimary: "#ffffff",
   error: "#c62828",
 };
 
 const styles = StyleSheet.create({
   screen: { flex: 1, padding: 24, gap: 12 },
+  picker: { gap: CARD_GAP },
+  card: {
+    width: CARD_WIDTH,
+    height: 56,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.fieldBorder,
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  selectedCard: { borderWidth: 2, borderColor: colors.primary },
+  fill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.fill,
+  },
+  cardLabel: { fontSize: 12, textAlign: "center", color: colors.text },
   header: { gap: 4 },
   trendRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   trend: { fontSize: 20, fontWeight: "600", color: colors.text },
