@@ -11,8 +11,8 @@ export function DayScreen() {
       <Text>Today is:</Text>
       <Text>{startOfDay(today).toLocaleDateString()}</Text>
       <Text>You will never be younger, you have never been older</Text>
-      <Link href="/bodyweight" style={styles.link}>
-        Your weight
+      <Link href="/weight-room" style={styles.link}>
+        Weight Room
       </Link>
     </View>
   );
