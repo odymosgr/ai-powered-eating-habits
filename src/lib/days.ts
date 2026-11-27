@@ -23,11 +23,13 @@ export function addDays(day: string, count: number): string {
   );
 }
 
-/** From the day's midnight up to, but not including, the next one. */
-export function dayRange(day: string): { from: Date; to: Date } {
-  const from = startOfDay(day);
-  const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
-  return { from, to };
+/** Like "Friday, November 27". */
+export function longDate(day: string): string {
+  return startOfDay(day).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 /**

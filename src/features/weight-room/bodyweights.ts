@@ -81,48 +81,51 @@ export function weightWindow(
   return { bottom, top: bottom + size };
 }
 
+/** A group's average bodyweight against the group before it, and the change in %. */
+export type Trend = { average: number; before: number; percent: number };
+
 /**
- * The average bodyweight of the last 3 days ending today against the 3 days
- * before them, and the change in %. Null when either group has fewer than 2
- * bodyweights (spec #1).
+ * The last 3 days ending today against the 3 days before them. Null when
+ * either group has fewer than 2 bodyweights (spec #1).
  */
 export function recentTrend(
   attempts: BodyweightEntryAttempt[],
   today: string,
-): { recent: number; before: number; percent: number } | null {
+): Trend | null {
   const bodyweights = (from: number) =>
-    [from, from + 1, from + 2].flatMap((count) => {
-      const bodyweight = bodyweightOn(attempts, addDays(today, -count));
-      return bodyweight === null ? [] : [bodyweight];
-    });
-  const recent = bodyweights(0);
-  const before = bodyweights(3);
-  if (recent.length < 2 || before.length < 2) return null;
-  const [recentAverage, beforeAverage] = [average(recent), average(before)];
-  return {
-    recent: recentAverage,
-    before: beforeAverage,
-    percent: ((recentAverage - beforeAverage) / beforeAverage) * 100,
-  };
+    bodyweightsOf(
+      attempts,
+      [from, from + 1, from + 2].map((count) => addDays(today, -count)),
+    );
+  return trendBetween(bodyweights(0), bodyweights(3), 2);
 }
 
 /**
- * The average bodyweight of the week starting `monday` against the previous
- * week's, and the change in %. Null when either week has fewer than 4 days
- * with a bodyweight (spec #1).
+ * The week starting `monday` against the previous week. Null when either week
+ * has fewer than 4 days with a bodyweight (spec #1).
  */
 export function weekTrend(
   attempts: BodyweightEntryAttempt[],
   monday: string,
-): { week: number; before: number; percent: number } | null {
-  const week = bodyweightsOf(attempts, weekOf(monday));
-  const before = bodyweightsOf(attempts, weekOf(addDays(monday, -7)));
-  if (week.length < 4 || before.length < 4) return null;
-  const [weekAverage, beforeAverage] = [average(week), average(before)];
+): Trend | null {
+  return trendBetween(
+    bodyweightsOf(attempts, weekOf(monday)),
+    bodyweightsOf(attempts, weekOf(addDays(monday, -7))),
+    4,
+  );
+}
+
+function trendBetween(
+  group: number[],
+  before: number[],
+  minimum: number,
+): Trend | null {
+  if (group.length < minimum || before.length < minimum) return null;
+  const [groupAverage, beforeAverage] = [average(group), average(before)];
   return {
-    week: weekAverage,
+    average: groupAverage,
     before: beforeAverage,
-    percent: ((weekAverage - beforeAverage) / beforeAverage) * 100,
+    percent: ((groupAverage - beforeAverage) / beforeAverage) * 100,
   };
 }
 
