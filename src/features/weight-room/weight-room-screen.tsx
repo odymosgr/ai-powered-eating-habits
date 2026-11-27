@@ -8,13 +8,14 @@ import {
   View,
 } from "react-native";
 
+import type { BodyweightEntryAttempt } from "@/lib/data/bodyweight";
 import { startOfDay, useToday } from "@/lib/days";
 
 import {
   useBodyweightEntryAttempts,
   useSaveBodyweightEntryAttempt,
 } from "./api";
-import { bodyweightOn } from "./bodyweights";
+import { bodyweightOn, confirmationReasons } from "./bodyweights";
 
 export function WeightRoomScreen() {
   const today = useToday();
@@ -62,7 +63,7 @@ export function WeightRoomScreen() {
         {isSheetOpen ? (
           <BodyweightSheet
             day={today}
-            bodyweight={bodyweight}
+            attempts={data}
             onClose={() => setSheetOpen(false)}
           />
         ) : null}
@@ -73,23 +74,91 @@ export function WeightRoomScreen() {
 
 function BodyweightSheet({
   day,
-  bodyweight,
+  attempts,
   onClose,
 }: {
   day: string;
-  bodyweight: number | null;
+  attempts: BodyweightEntryAttempt[];
   onClose: () => void;
 }) {
+  const bodyweight = bodyweightOn(attempts, day);
   const [text, setText] = useState(
     bodyweight === null ? "" : String(bodyweight),
   );
+  // The save waiting on the pop-up, with the reasons it names.
+  const [asking, setAsking] = useState<{
+    weightKg: number | null;
+    reasons: string[];
+  } | null>(null);
   const { save, isPending, isError } = useSaveBodyweightEntryAttempt();
   const weightKg = parseWeight(text);
   const canSave = weightKg !== null && !isPending;
 
   function handleSave() {
-    if (!canSave) return;
-    save({ day, weightKg, confirmed: true }, { onSuccess: onClose });
+    if (canSave) ask(weightKg);
+  }
+
+  function ask(newWeightKg: number | null) {
+    const reasons = confirmationReasons(attempts, day, newWeightKg);
+    if (reasons.length > 0) setAsking({ weightKg: newWeightKg, reasons });
+    else
+      save(
+        { day, weightKg: newWeightKg, confirmed: true },
+        { onSuccess: onClose },
+      );
+  }
+
+  function handleAnswer(confirmed: boolean) {
+    if (!asking || isPending) return;
+    save(
+      { day, weightKg: asking.weightKg, confirmed },
+      { onSuccess: confirmed ? onClose : () => setAsking(null) },
+    );
+  }
+
+  if (asking) {
+    return (
+      <View style={styles.backdrop}>
+        <View style={styles.backdropTap} />
+        <View style={styles.sheet}>
+          {asking.reasons.map((reason) => (
+            <Text key={reason} style={styles.reason}>
+              {reason}
+            </Text>
+          ))}
+          {isError ? (
+            <Text style={styles.error}>{"Couldn't save your bodyweight."}</Text>
+          ) : null}
+          <View style={styles.answers}>
+            <Pressable
+              accessibilityRole="button"
+              disabled={isPending}
+              onPress={() => handleAnswer(false)}
+              style={({ pressed }) => [
+                styles.button,
+                styles.answer,
+                styles.secondary,
+                (pressed || isPending) && styles.dimmed,
+              ]}
+            >
+              <Text style={styles.secondaryText}>No</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              disabled={isPending}
+              onPress={() => handleAnswer(true)}
+              style={({ pressed }) => [
+                styles.button,
+                styles.answer,
+                (pressed || isPending) && styles.dimmed,
+              ]}
+            >
+              <Text style={styles.buttonText}>Yes</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -116,6 +185,20 @@ function BodyweightSheet({
         />
         {isError ? (
           <Text style={styles.error}>{"Couldn't save your bodyweight."}</Text>
+        ) : null}
+        {bodyweight !== null ? (
+          <Pressable
+            accessibilityRole="button"
+            disabled={isPending}
+            onPress={() => ask(null)}
+            style={({ pressed }) => [
+              styles.button,
+              styles.secondary,
+              (pressed || isPending) && styles.dimmed,
+            ]}
+          >
+            <Text style={styles.secondaryText}>Clear</Text>
+          </Pressable>
         ) : null}
         <Pressable
           accessibilityRole="button"
@@ -199,6 +282,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   dimmed: { opacity: 0.5 },
+  answers: { flexDirection: "row", gap: 12 },
+  answer: { flex: 1 },
+  secondary: {
+    borderWidth: 1,
+    borderColor: colors.fieldBorder,
+    backgroundColor: colors.sheet,
+  },
+  secondaryText: { fontSize: 17, fontWeight: "600", color: colors.text },
+  reason: { fontSize: 17, color: colors.text },
   buttonText: { fontSize: 17, fontWeight: "600", color: colors.onPrimary },
   muted: { fontSize: 15, color: colors.muted },
   error: { fontSize: 15, color: colors.error },
