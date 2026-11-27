@@ -1,5 +1,5 @@
 import type { BodyweightEntryAttempt } from "@/lib/data/bodyweight";
-import { startOfDay } from "@/lib/days";
+import { addDays, startOfDay } from "@/lib/days";
 
 /**
  * The day's bodyweight: the weight of its latest confirmed attempt. Null when
@@ -45,18 +45,67 @@ function latestBodyweightBefore(
   attempts: BodyweightEntryAttempt[],
   day: string,
 ): number | null {
-  const end = startOfDay(day).getTime();
-  // Rounded, since a day across a daylight saving change isn't 24 hours.
-  const daysBefore = (other: string) =>
-    Math.round((end - startOfDay(other).getTime()) / 86_400_000);
-  const days = new Set(
-    attempts
-      .map((a) => a.day)
-      .filter((d) => daysBefore(d) >= 1 && daysBefore(d) <= 7),
-  );
-  for (const d of [...days].sort().reverse()) {
-    const bodyweight = bodyweightOn(attempts, d);
+  for (let count = 1; count <= 7; count++) {
+    const bodyweight = bodyweightOn(attempts, addDays(day, -count));
     if (bodyweight !== null) return bodyweight;
   }
   return null;
+}
+
+/** Monday to Sunday of the week holding `day`. */
+export function weekOf(day: string): string[] {
+  // getDay() counts from Sunday = 0.
+  const monday = addDays(day, -((startOfDay(day).getDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, count) => addDays(monday, count));
+}
+
+/** Today and the 6 days before it: the days a user can set or clear (spec #1). */
+export function isEditable(day: string, today: string): boolean {
+  return day <= today && day >= addDays(today, -6);
+}
+
+/**
+ * The chart's weight window: 5 kg with whole-kg ends, centred on the average
+ * of `bodyweights`, moved or widened just enough to hold them all (spec #1).
+ * Null when there are none.
+ */
+export function weightWindow(
+  bodyweights: number[],
+): { bottom: number; top: number } | null {
+  if (bodyweights.length === 0) return null;
+  const lowest = Math.floor(Math.min(...bodyweights));
+  const highest = Math.ceil(Math.max(...bodyweights));
+  const size = Math.max(5, highest - lowest);
+  const centred = Math.round(average(bodyweights) - 2.5);
+  const bottom = Math.min(Math.max(centred, highest - size), lowest);
+  return { bottom, top: bottom + size };
+}
+
+/**
+ * The average bodyweight of the last 3 days ending today against the 3 days
+ * before them, and the change in %. Null when either group has fewer than 2
+ * bodyweights (spec #1).
+ */
+export function recentTrend(
+  attempts: BodyweightEntryAttempt[],
+  today: string,
+): { recent: number; before: number; percent: number } | null {
+  const bodyweights = (from: number) =>
+    [from, from + 1, from + 2].flatMap((count) => {
+      const bodyweight = bodyweightOn(attempts, addDays(today, -count));
+      return bodyweight === null ? [] : [bodyweight];
+    });
+  const recent = bodyweights(0);
+  const before = bodyweights(3);
+  if (recent.length < 2 || before.length < 2) return null;
+  const [recentAverage, beforeAverage] = [average(recent), average(before)];
+  return {
+    recent: recentAverage,
+    before: beforeAverage,
+    percent: ((recentAverage - beforeAverage) / beforeAverage) * 100,
+  };
+}
+
+function average(values: number[]): number {
+  return values.reduce((sum, v) => sum + v, 0) / values.length;
 }

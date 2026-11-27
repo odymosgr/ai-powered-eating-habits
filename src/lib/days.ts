@@ -15,6 +15,14 @@ export function startOfDay(day: string): Date {
   return new Date(year, month - 1, date);
 }
 
+/** The day `count` days after `day`, or before it when `count` is negative. */
+export function addDays(day: string, count: number): string {
+  const date = startOfDay(day);
+  return toDay(
+    new Date(date.getFullYear(), date.getMonth(), date.getDate() + count),
+  );
+}
+
 /** From the day's midnight up to, but not including, the next one. */
 export function dayRange(day: string): { from: Date; to: Date } {
   const from = startOfDay(day);

@@ -15,12 +15,20 @@ import {
   useBodyweightEntryAttempts,
   useSaveBodyweightEntryAttempt,
 } from "./api";
-import { bodyweightOn, confirmationReasons } from "./bodyweights";
+import {
+  bodyweightOn,
+  confirmationReasons,
+  isEditable,
+  recentTrend,
+  weekOf,
+  weightWindow,
+} from "./bodyweights";
 
 export function WeightRoomScreen() {
   const today = useToday();
   const { data, isError } = useBodyweightEntryAttempts();
-  const [isSheetOpen, setSheetOpen] = useState(false);
+  // The day the sheet is open on, or null while it's closed.
+  const [sheetDay, setSheetDay] = useState<string | null>(null);
 
   // Rows already on screen stay when a refetch fails, so the error shows
   // only when there is nothing to show instead.
@@ -36,40 +44,181 @@ export function WeightRoomScreen() {
     );
   }
 
-  const bodyweight = bodyweightOn(data, today);
-
   return (
     <View style={styles.screen}>
-      <View style={styles.today}>
-        <Text style={styles.muted}>Today</Text>
-        <Text style={styles.weight}>
-          {bodyweight === null ? "?" : `${bodyweight} kg`}
-        </Text>
-      </View>
+      <Header attempts={data} today={today} />
+      <WeekChart attempts={data} today={today} onDayPress={setSheetDay} />
       <Pressable
         accessibilityRole="button"
-        onPress={() => setSheetOpen(true)}
+        onPress={() => setSheetDay(today)}
         style={({ pressed }) => [styles.fab, pressed && styles.dimmed]}
       >
         <Text style={styles.buttonText}>{"Log today's BW"}</Text>
       </Pressable>
       <Modal
-        visible={isSheetOpen}
+        visible={sheetDay !== null}
         transparent
         animationType="slide"
-        onRequestClose={() => setSheetOpen(false)}
+        onRequestClose={() => setSheetDay(null)}
       >
         {/* Mounted only while open, so the field starts from the day's current bodyweight. */}
-        {isSheetOpen ? (
+        {sheetDay !== null ? (
           <BodyweightSheet
-            day={today}
+            day={sheetDay}
             attempts={data}
-            onClose={() => setSheetOpen(false)}
+            onClose={() => setSheetDay(null)}
           />
         ) : null}
       </Modal>
     </View>
   );
+}
+
+function Header({
+  attempts,
+  today,
+}: {
+  attempts: BodyweightEntryAttempt[];
+  today: string;
+}) {
+  const [isHelpOpen, setHelpOpen] = useState(false);
+  const trend = recentTrend(attempts, today);
+  const week = weekOf(today);
+  const shortDate = (day: string) =>
+    startOfDay(day).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
+  return (
+    <View style={styles.header}>
+      <View style={styles.trendRow}>
+        <Text style={styles.trend}>
+          {`Recent trend: ${trend ? formatPercent(trend.percent) : "N/A"}`}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="About the recent trend"
+          onPress={() => setHelpOpen((open) => !open)}
+          style={({ pressed }) => [styles.help, pressed && styles.dimmed]}
+        >
+          <Text style={styles.helpText}>?</Text>
+        </Pressable>
+      </View>
+      {isHelpOpen ? (
+        <Text style={styles.muted}>
+          {trend
+            ? `The last 3 days average ${formatKg(trend.recent)} kg, against ${formatKg(trend.before)} kg in the 3 days before them: ${formatPercent(trend.percent)}.`
+            : "N/A due to missing data"}
+        </Text>
+      ) : null}
+      <Text style={styles.muted}>
+        {`${shortDate(week[0])} – ${shortDate(week[6])}`}
+      </Text>
+    </View>
+  );
+}
+
+function formatPercent(percent: number): string {
+  const rounded = Math.abs(percent).toFixed(1);
+  if (rounded === "0.0") return "0.0%";
+  return `${percent > 0 ? "+" : "-"}${rounded}%`;
+}
+
+// At most one decimal, without a trailing ".0".
+function formatKg(kg: number): string {
+  return String(Math.round(kg * 10) / 10);
+}
+
+function WeekChart({
+  attempts,
+  today,
+  onDayPress,
+}: {
+  attempts: BodyweightEntryAttempt[];
+  today: string;
+  onDayPress: (day: string) => void;
+}) {
+  const days = weekOf(today).map((day) => ({
+    day,
+    bodyweight: bodyweightOn(attempts, day),
+  }));
+  const range = weightWindow(
+    days.flatMap((d) => (d.bodyweight === null ? [] : [d.bodyweight])),
+  );
+
+  return (
+    <View style={styles.chart}>
+      {range ? (
+        <View style={styles.axis}>
+          <Text style={styles.axisLabel}>{`${range.top} kg`}</Text>
+          <Text style={styles.axisLabel}>{`${range.bottom} kg`}</Text>
+        </View>
+      ) : null}
+      {days.map(({ day, bodyweight }) => {
+        const editable = isEditable(day, today);
+        const letter = (
+          <Text style={editable ? styles.letter : styles.readOnlyLetter}>
+            {startOfDay(day).toLocaleDateString("en-US", { weekday: "narrow" })}
+          </Text>
+        );
+        if (day > today) {
+          return (
+            <View key={day} style={styles.column}>
+              <View style={styles.plot} />
+              {letter}
+            </View>
+          );
+        }
+        const plot = (
+          <View style={styles.plot}>
+            {bodyweight === null || !range ? (
+              <Text style={styles.missing}>?</Text>
+            ) : (
+              <View
+                testID="bar"
+                style={[
+                  styles.bar,
+                  {
+                    height: `${((bodyweight - range.bottom) / (range.top - range.bottom)) * 100}%`,
+                  },
+                ]}
+              >
+                {/* Above the bar, in the plot's top padding when the bar is full height. */}
+                <Text style={styles.barLabel}>{String(bodyweight)}</Text>
+              </View>
+            )}
+          </View>
+        );
+        const label = `${longDate(day)}, ${bodyweight === null ? "no bodyweight" : `${bodyweight} kg`}`;
+        return editable ? (
+          <Pressable
+            key={day}
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            onPress={() => onDayPress(day)}
+            style={({ pressed }) => [styles.column, pressed && styles.dimmed]}
+          >
+            {plot}
+            {letter}
+          </Pressable>
+        ) : (
+          <View key={day} accessibilityLabel={label} style={styles.column}>
+            {plot}
+            {letter}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+function longDate(day: string): string {
+  return startOfDay(day).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 function BodyweightSheet({
@@ -165,13 +314,7 @@ function BodyweightSheet({
     <View style={styles.backdrop}>
       <Pressable style={styles.backdropTap} onPress={onClose} />
       <View style={styles.sheet}>
-        <Text style={styles.sheetTitle}>
-          {startOfDay(day).toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          })}
-        </Text>
+        <Text style={styles.sheetTitle}>{longDate(day)}</Text>
         <TextInput
           style={styles.input}
           placeholder="Weight in kg"
@@ -228,6 +371,7 @@ function parseWeight(text: string): number | null {
 const colors = {
   text: "#111111",
   muted: "#666666",
+  readOnly: "#9e9e9e",
   placeholder: "#8a8a8a",
   fieldBorder: "#d4d4d4",
   field: "#fafafa",
@@ -240,8 +384,47 @@ const colors = {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, padding: 24, gap: 12 },
-  today: { gap: 4 },
-  weight: { fontSize: 34, fontWeight: "600", color: colors.text },
+  header: { gap: 4 },
+  trendRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  trend: { fontSize: 20, fontWeight: "600", color: colors.text },
+  help: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.fieldBorder,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  helpText: { fontSize: 15, fontWeight: "600", color: colors.muted },
+  chart: { flexDirection: "row", height: 240, gap: 4 },
+  axis: { justifyContent: "space-between", paddingTop: 20, paddingBottom: 28 },
+  axisLabel: { fontSize: 12, color: colors.muted },
+  column: { flex: 1, alignItems: "center", gap: 6 },
+  plot: {
+    flex: 1,
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingTop: 20,
+  },
+  bar: {
+    alignSelf: "stretch",
+    borderRadius: 4,
+    backgroundColor: colors.primary,
+  },
+  barLabel: {
+    position: "absolute",
+    top: -18,
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontSize: 12,
+    color: colors.text,
+  },
+  missing: { fontSize: 17, fontWeight: "600", color: colors.muted },
+  letter: { fontSize: 15, fontWeight: "700", color: colors.text },
+  readOnlyLetter: { fontSize: 15, fontWeight: "400", color: colors.readOnly },
   fab: {
     position: "absolute",
     right: 24,
