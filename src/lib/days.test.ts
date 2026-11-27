@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { AppState, type AppStateStatus } from "react-native";
 
-import { dayRange, startOfDay, useToday } from "./days";
+import { startOfDay, useToday } from "./days";
 
 afterEach(() => {
   jest.useRealTimers();
@@ -10,13 +10,6 @@ afterEach(() => {
 
 test("starts a day at local midnight", () => {
   expect(startOfDay("2026-11-18")).toEqual(new Date(2026, 10, 18));
-});
-
-test("ends a day at the next midnight, even across a month", () => {
-  expect(dayRange("2026-11-30")).toEqual({
-    from: new Date(2026, 10, 30),
-    to: new Date(2026, 11, 1),
-  });
 });
 
 test("follows the date when the app returns to the foreground", async () => {

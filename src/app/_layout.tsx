@@ -25,7 +25,7 @@ export default function RootLayout() {
             name="index"
             options={{ title: "Today", headerRight: () => <SignOutButton /> }}
           />
-          <Stack.Screen name="bodyweight" options={{ title: "Weight" }} />
+          <Stack.Screen name="weight-room" options={{ title: "Weight Room" }} />
         </Stack.Protected>
         <Stack.Protected guard={!isSignedIn}>
           <Stack.Screen name="sign-in" options={{ headerShown: false }} />

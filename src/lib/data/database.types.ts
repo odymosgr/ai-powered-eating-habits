@@ -34,28 +34,34 @@ export type Database = {
   };
   public: {
     Tables: {
-      bodyweights: {
+      bodyweight_entry_attempts: {
         Row: {
-          created_at: string;
+          confirmed: boolean;
+          day: string;
           id: string;
-          measured_at: string;
+          saved_at: string;
+          timezone: string;
           user_id: string;
-          weight_kg: number;
+          weight_kg: number | null;
         };
         ComputedFields: never;
         Insert: {
-          created_at?: string;
+          confirmed: boolean;
+          day: string;
           id: string;
-          measured_at?: string;
+          saved_at?: string;
+          timezone: string;
           user_id?: string;
-          weight_kg: number;
+          weight_kg?: number | null;
         };
         Update: {
-          created_at?: string;
+          confirmed?: boolean;
+          day?: string;
           id?: string;
-          measured_at?: string;
+          saved_at?: string;
+          timezone?: string;
           user_id?: string;
-          weight_kg?: number;
+          weight_kg?: number | null;
         };
         Relationships: [];
       };

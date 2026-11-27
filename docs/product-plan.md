@@ -97,7 +97,9 @@ _Notes: p0, p4–5, p7, p9–10, p12, p18, p28, p32–33._
 ### 3.1 Bodyweight
 
 - Measured in the morning, after a full night's sleep and a possible toilet trip. Daily fluctuations are expected and must not discourage the user.
-- One measurement per day, editable until the end of the next day. Huge jumps may be refused outright.
+- One [bodyweight](../GLOSSARY.md#bodyweight) per day. Logging again that day replaces it, and clearing removes it, each after a confirmation pop-up. Every attempt is kept, the declined ones too, each naming the day it's for ([§9.2](#92-data-rules)).
+- Editable for a week: today and the 6 days before it. Older days are read-only, and a day missed in that window stays missing.
+- A weight more than 5% from the latest one in the past 7 days asks "Are you sure?" instead of being refused.
 - Entered in the Weight Room ([§8.3](#83-weight-room)) or through chat.
 - A scale is optional ([§6.3](#63-boundaries)).
 
@@ -130,8 +132,9 @@ Each log is a short thread between the user and the AI. Its review steps exist t
 
 ### 3.3 Days
 
-- A day runs 04:00–04:00 in the user's timezone. 04:00 is the middle of a typical night (sleep around midnight to 08:00): a practical default, easy to change later because days are derived from stored times ([§9.2](#92-data-rules)). For unstable sleepers, contextual anchors ("when I wake up", "before work", "at lunchtime") keep the app useful. Onboarding asks about sleep stability (and stomach).
-- **Weeks** run Monday–Sunday and belong to the month their Monday falls in, numbered 1–5 within it (p32–33).
+- [Days](../GLOSSARY.md#time) change at midnight in the user's timezone for now.
+- **Later, a day boundary from the user's sleep:** each user's day changes in the middle of their usual sleep, e.g. at 04:00 for someone sleeping 24:00–08:00, and they can change it. Mainly a presentation feature, since days are derived from stored times ([§9.2](#92-data-rules)). Bodyweights stay put, since each names its day ([§9.2](#92-data-rules)); to solve when building: what moving the boundary does to meals and other events stored by time. For unstable sleepers, contextual anchors ("when I wake up", "before work", "at lunchtime") keep the app useful. Onboarding asks about sleep stability (and stomach).
+- [Weeks](../GLOSSARY.md#time) are numbered 1–5 within their month (p32–33).
 - **Parts of the day:** a predefined set of labels at first (morning · lunchtime · afternoon · night · midnight), maybe user-defined later. A label implies a rough time, so users can tag meals without being specific, which suits end-of-day logging. An exact time, when given, is a better data point.
 - The **day page** shows the day's events in strict order. Users can reorder them; leaving without saving asks for confirmation. Tapping an event reopens its thread to correct it.
 
@@ -397,15 +400,16 @@ Sketched on p32–33 as the "Weight Viewer". Details get specified when the feat
 
 ![Weight Viewer wireframe: trend header with help button, weekly bar chart with a dotted goal line, week info, week picker carousel, full calendar button and the log and edit buttons](initial-notes/initial-notes-diagrams/p32-weight-viewer.svg)
 
-- **Week chart:** one bar per day, Monday to Sunday ([§3.3](#33-days)), on a weight window of about 5 kg: small enough for differences to show, large enough to fit the data. Missing days show "?". A dotted line marks this week's goal weight.
-- **Header:** the week's trend (% change), or the goal trend for the current week. Its "?" shows the details: the trend or "N/A due to missing data", and the goal.
-- **Week picker:** a carousel of week cards ("Jan '26 week 4"), each filled with a soft colour whose height shows how many of the 7 days are logged. The selected week sits in the centre, except the first or last.
-- **Buttons:** a floating "Log today's BW", which logs or edits today's weight, and "Edit yesterday's BW" ([§3.1](#31-bodyweight)). "Full calendar view" sits under the picker.
+- **Week chart:** one bar per day, Monday to Sunday ([§3.3](#33-days)), on a weight window of about 5 kg: small enough for differences to show, large enough to fit the data. Missing days show "?"; days still ahead show only their letter. A dotted line marks this week's goal weight.
+- **Header:** the [week trend](../GLOSSARY.md#bodyweight); for the current week, the [recent trend](../GLOSSARY.md#bodyweight), and the goal trend once goals exist. Its "?" shows the details: the trend or "N/A due to missing data", and the goal.
+- **Weight window:** 5 kg with whole-kg ends, centred on the week's average; wider only when the whole-kg range of the week's weights exceeds 5 kg, and off-centre when needed to hold every bar.
+- **Week picker:** a carousel of week cards ("Jan '26 week 4"), from the week of the first bodyweight to the current week, each filled with a soft colour whose height shows how many of the 7 days are logged. It opens on the current week; a tapped week moves to the centre, except the first or last.
+- **Logging:** a floating "Log today's BW" logs or edits today's [bodyweight](../GLOSSARY.md#bodyweight). Tapping a day's bar or "?" edits or clears that day, while it's editable ([§3.1](#31-bodyweight)). Both open one bottom sheet: the day's date, a decimal field holding its current bodyweight, Save, and Clear when the day has one. Editable days have a thick black letter, older ones a thinner gray one. "Full calendar view" sits under the picker.
 - **Full calendar view:** months as rows, newest on top, and weeks 1–5 as columns. Each week shows its average weight as a point on a line, with its trend % above. Value labels sit away from the line, and the line turns dotted where an average comes from far-away values or missing data. Each month row gets its own weight window, sized so every visual fits.
 
 ![Full Calendar View wireframe: months as rows and weeks 1 to 5 as columns, each week's average bodyweight on a line with its trend above, label placement rules and dotted lines for inferred averages](initial-notes/initial-notes-diagrams/p33-full-calendar-view.svg)
 
-To consider when building: bars that don't start at zero exaggerate small daily swings, which can discourage (p18); points or a line may read more honestly on a narrow window.
+Bars for now, though bars that don't start at zero exaggerate small daily swings, which can discourage (p18). Points or a line may read more honestly on a narrow window.
 
 ## 9. Technical foundations
 
@@ -428,6 +432,7 @@ Extraction doesn't depend on goals; scoring does. So changing goals, or viewing 
 
 | Topic | Rule | Why |
 | --- | --- | --- |
+| Behaviour | Keep every user action, never overwrite: each bodyweight save is a new [attempt](../GLOSSARY.md#bodyweight), declined ones included, and the screen shows the latest confirmed one. An attempt names the day it's for instead of deriving it from when it was saved | More behaviour data for better predictions and classification; logging past days; a later day boundary ([§3.3](#33-days)) moves no weights |
 | Raw input | Keep the user's original words (text or transcript) and each photo's AI description. Don't keep raw audio or photos after processing | Re-parse old logs with better prompts or models; privacy; storage |
 | AI outputs | Tag each with its prompt and model version | Know what to recompute; compare versions |
 | Parsing | Every log thread has a parse status. The parse function replies at once, and a sweeper or queue retries failures. Parse versions sit side by side, with an active flag | A failed LLM call loses nothing; a new parse never overwrites the old one |

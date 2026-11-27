@@ -15,11 +15,21 @@ export function startOfDay(day: string): Date {
   return new Date(year, month - 1, date);
 }
 
-/** From the day's midnight up to, but not including, the next one. */
-export function dayRange(day: string): { from: Date; to: Date } {
-  const from = startOfDay(day);
-  const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1);
-  return { from, to };
+/** The day `count` days after `day`, or before it when `count` is negative. */
+export function addDays(day: string, count: number): string {
+  const date = startOfDay(day);
+  return toDay(
+    new Date(date.getFullYear(), date.getMonth(), date.getDate() + count),
+  );
+}
+
+/** Like "Friday, November 27". */
+export function longDate(day: string): string {
+  return startOfDay(day).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 /**
